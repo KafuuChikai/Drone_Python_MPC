@@ -393,6 +393,9 @@ void drone_simple_acados_create_5_set_nlp_in(drone_simple_solver_capsule* capsul
     W_0[0+(NY0) * 0] = 200;
     W_0[1+(NY0) * 1] = 200;
     W_0[2+(NY0) * 2] = 500;
+    W_0[6+(NY0) * 6] = 5;
+    W_0[7+(NY0) * 7] = 5;
+    W_0[8+(NY0) * 8] = 200;
     W_0[10+(NY0) * 10] = 6;
     W_0[11+(NY0) * 11] = 6;
     W_0[12+(NY0) * 12] = 6;
@@ -403,6 +406,9 @@ void drone_simple_acados_create_5_set_nlp_in(drone_simple_solver_capsule* capsul
     W[0+(NY) * 0] = 200;
     W[1+(NY) * 1] = 200;
     W[2+(NY) * 2] = 500;
+    W[6+(NY) * 6] = 5;
+    W[7+(NY) * 7] = 5;
+    W[8+(NY) * 8] = 200;
     W[10+(NY) * 10] = 6;
     W[11+(NY) * 11] = 6;
     W[12+(NY) * 12] = 6;
@@ -417,6 +423,9 @@ void drone_simple_acados_create_5_set_nlp_in(drone_simple_solver_capsule* capsul
     W_e[0+(NYN) * 0] = 200;
     W_e[1+(NYN) * 1] = 200;
     W_e[2+(NYN) * 2] = 500;
+    W_e[6+(NYN) * 6] = 5;
+    W_e[7+(NYN) * 7] = 5;
+    W_e[8+(NYN) * 8] = 200;
     ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, N, "W", W_e);
     free(W_e);
     double* Vx_0 = calloc(NY0*NX, sizeof(double));
@@ -544,7 +553,7 @@ void drone_simple_acados_create_5_set_nlp_in(drone_simple_solver_capsule* capsul
     double* lbu = lubu;
     double* ubu = lubu + NBU;
     
-    ubu[0] = 30;
+    ubu[0] = 34;
     lbu[1] = -6.283185307179586;
     ubu[1] = 6.283185307179586;
     lbu[2] = -6.283185307179586;
