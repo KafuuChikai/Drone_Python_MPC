@@ -63,7 +63,7 @@
 #define DRONE_SIMPLE_NY0    13
 #define DRONE_SIMPLE_NY     13
 #define DRONE_SIMPLE_NYN    9
-#define DRONE_SIMPLE_N      100
+#define DRONE_SIMPLE_N      20
 #define DRONE_SIMPLE_NH     0
 #define DRONE_SIMPLE_NPHI   0
 #define DRONE_SIMPLE_NHN    0

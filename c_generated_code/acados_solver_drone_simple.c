@@ -355,7 +355,7 @@ void drone_simple_acados_create_5_set_nlp_in(drone_simple_solver_capsule* capsul
     if (new_time_steps) {
         drone_simple_acados_update_time_steps(capsule, N, new_time_steps);
     } else {// all time_steps are identical
-        double time_step = 0.0005;
+        double time_step = 0.05;
         for (int i = 0; i < N; i++)
         {
             ocp_nlp_in_set(nlp_config, nlp_dims, nlp_in, i, "Ts", &time_step);
@@ -393,13 +393,6 @@ void drone_simple_acados_create_5_set_nlp_in(drone_simple_solver_capsule* capsul
     W_0[0+(NY0) * 0] = 200;
     W_0[1+(NY0) * 1] = 200;
     W_0[2+(NY0) * 2] = 500;
-    W_0[3+(NY0) * 3] = 1;
-    W_0[4+(NY0) * 4] = 1;
-    W_0[5+(NY0) * 5] = 1;
-    W_0[6+(NY0) * 6] = 5;
-    W_0[7+(NY0) * 7] = 5;
-    W_0[8+(NY0) * 8] = 200;
-    W_0[9+(NY0) * 9] = 6;
     W_0[10+(NY0) * 10] = 6;
     W_0[11+(NY0) * 11] = 6;
     W_0[12+(NY0) * 12] = 6;
@@ -410,13 +403,6 @@ void drone_simple_acados_create_5_set_nlp_in(drone_simple_solver_capsule* capsul
     W[0+(NY) * 0] = 200;
     W[1+(NY) * 1] = 200;
     W[2+(NY) * 2] = 500;
-    W[3+(NY) * 3] = 1;
-    W[4+(NY) * 4] = 1;
-    W[5+(NY) * 5] = 1;
-    W[6+(NY) * 6] = 5;
-    W[7+(NY) * 7] = 5;
-    W[8+(NY) * 8] = 200;
-    W[9+(NY) * 9] = 6;
     W[10+(NY) * 10] = 6;
     W[11+(NY) * 11] = 6;
     W[12+(NY) * 12] = 6;
@@ -431,12 +417,6 @@ void drone_simple_acados_create_5_set_nlp_in(drone_simple_solver_capsule* capsul
     W_e[0+(NYN) * 0] = 200;
     W_e[1+(NYN) * 1] = 200;
     W_e[2+(NYN) * 2] = 500;
-    W_e[3+(NYN) * 3] = 1;
-    W_e[4+(NYN) * 4] = 1;
-    W_e[5+(NYN) * 5] = 1;
-    W_e[6+(NYN) * 6] = 5;
-    W_e[7+(NYN) * 7] = 5;
-    W_e[8+(NYN) * 8] = 200;
     ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, N, "W", W_e);
     free(W_e);
     double* Vx_0 = calloc(NY0*NX, sizeof(double));
