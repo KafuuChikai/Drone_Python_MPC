@@ -39,28 +39,28 @@
 
 # model
 MODEL_SRC=
-MODEL_SRC+= drone_simple_model/drone_simple_expl_ode_fun.c
-MODEL_SRC+= drone_simple_model/drone_simple_expl_vde_forw.c
-MODEL_SRC+= drone_simple_model/drone_simple_expl_vde_adj.c
+MODEL_SRC+= drone_simple_drag_model/drone_simple_drag_expl_ode_fun.c
+MODEL_SRC+= drone_simple_drag_model/drone_simple_drag_expl_vde_forw.c
+MODEL_SRC+= drone_simple_drag_model/drone_simple_drag_expl_vde_adj.c
 MODEL_OBJ := $(MODEL_SRC:.c=.o)
 
 # optimal control problem - mostly CasADi exports
 OCP_SRC=
 
-OCP_SRC+= acados_solver_drone_simple.c
+OCP_SRC+= acados_solver_drone_simple_drag.c
 OCP_OBJ := $(OCP_SRC:.c=.o)
 
 # for sim solver
-SIM_SRC= acados_sim_solver_drone_simple.c
+SIM_SRC= acados_sim_solver_drone_simple_drag.c
 SIM_OBJ := $(SIM_SRC:.c=.o)
 
 # for target example
-EX_SRC= main_drone_simple.c
+EX_SRC= main_drone_simple_drag.c
 EX_OBJ := $(EX_SRC:.c=.o)
 EX_EXE := $(EX_SRC:.c=)
 
 # for target example_sim
-EX_SIM_SRC= main_sim_drone_simple.c
+EX_SIM_SRC= main_sim_drone_simple_drag.c
 EX_SIM_OBJ := $(EX_SIM_SRC:.c=.o)
 EX_SIM_EXE := $(EX_SIM_SRC:.c=)
 
@@ -99,8 +99,8 @@ LDLIBS+= -lm
 LDLIBS+= 
 
 # libraries
-LIBACADOS_SOLVER=libacados_solver_drone_simple.so
-LIBACADOS_OCP_SOLVER=libacados_ocp_solver_drone_simple.so
+LIBACADOS_SOLVER=libacados_solver_drone_simple_drag.so
+LIBACADOS_OCP_SOLVER=libacados_ocp_solver_drone_simple_drag.so
 LIBACADOS_SIM_SOLVER=lib$(SIM_SRC:.c=.so)
 
 # virtual targets
@@ -135,7 +135,7 @@ ocp_cython_c: ocp_shared_lib
 	-o acados_ocp_solver_pyx.c \
 	-I $(INCLUDE_PATH)/../interfaces/acados_template/acados_template \
 	$(INCLUDE_PATH)/../interfaces/acados_template/acados_template/acados_ocp_solver_pyx.pyx \
-	-I /home/wx/python_mpc/c_generated_code \
+	-I /home/wx/Drone_Python_MPC/c_generated_code \
 
 ocp_cython_o: ocp_cython_c
 	$(CC) $(ACADOS_FLAGS) -c -O2 \
@@ -153,7 +153,7 @@ ocp_cython: ocp_cython_o
 	-o acados_ocp_solver_pyx.so \
 	-Wl,-rpath=$(LIB_PATH) \
 	acados_ocp_solver_pyx.o \
-	$(abspath .)/libacados_ocp_solver_drone_simple.so \
+	$(abspath .)/libacados_ocp_solver_drone_simple_drag.so \
 	$(LDFLAGS) $(LDLIBS)
 
 # Sim Cython targets
@@ -162,7 +162,7 @@ sim_cython_c: sim_shared_lib
 	-o acados_sim_solver_pyx.c \
 	-I $(INCLUDE_PATH)/../interfaces/acados_template/acados_template \
 	$(INCLUDE_PATH)/../interfaces/acados_template/acados_template/acados_sim_solver_pyx.pyx \
-	-I /home/wx/python_mpc/c_generated_code \
+	-I /home/wx/Drone_Python_MPC/c_generated_code \
 
 sim_cython_o: sim_cython_c
 	$(CC) $(ACADOS_FLAGS) -c -O2 \
@@ -180,7 +180,7 @@ sim_cython: sim_cython_o
 	-o acados_sim_solver_pyx.so \
 	-Wl,-rpath=$(LIB_PATH) \
 	acados_sim_solver_pyx.o \
-	$(abspath .)/libacados_sim_solver_drone_simple.so \
+	$(abspath .)/libacados_sim_solver_drone_simple_drag.so \
 	$(LDFLAGS) $(LDLIBS)
 
 clean:
@@ -193,13 +193,13 @@ clean_ocp_shared_lib:
 	$(RM) $(OCP_OBJ)
 
 clean_ocp_cython:
-	$(RM) libacados_ocp_solver_drone_simple.so
-	$(RM) acados_solver_drone_simple.o
+	$(RM) libacados_ocp_solver_drone_simple_drag.so
+	$(RM) acados_solver_drone_simple_drag.o
 	$(RM) acados_ocp_solver_pyx.so
 	$(RM) acados_ocp_solver_pyx.o
 
 clean_sim_cython:
-	$(RM) libacados_sim_solver_drone_simple.so
-	$(RM) acados_sim_solver_drone_simple.o
+	$(RM) libacados_sim_solver_drone_simple_drag.so
+	$(RM) acados_sim_solver_drone_simple_drag.o
 	$(RM) acados_sim_solver_pyx.so
 	$(RM) acados_sim_solver_pyx.o

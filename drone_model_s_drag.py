@@ -12,15 +12,17 @@ class DroneModel(object):
         constraint = ca.types.SimpleNamespace()
         
         # param
-        self.I_xx = 2.5e-3
-        self.I_yy = 2.1e-3
-        self.I_zz = 4.3e-3
-        self.m = 0.75
+        # self.I_xx = 2.5e-3
+        # self.I_yy = 2.1e-3
+        # self.I_zz = 4.3e-3
+        # self.I = np.array([[self.I_xx, .0, .0], [.0, self.I_yy, .0], [.0, .0, self.I_zz]])
+        self.m = 1.5
         self.g = 9.8
-        self.I = np.array([[self.I_xx, .0, .0], [.0, self.I_yy, .0], [.0, .0, self.I_zz]])
         z_axis = np.array([0,0,1])
         k_d = np.array([0.26, 0.28, 0.42])
         k_h = 0.01
+        motor_constant = 5.84e-6
+        rotor_drag_coefficient = 0.000175
         
         # control input
         T = ca.MX.sym('thrust',1)
@@ -34,15 +36,23 @@ class DroneModel(object):
         states = ca.vertcat(p, v, q)        
         
         # function
-        force_T = self.q_rot(q, T*z_axis)
+        z_b_axis = self.q_rot(q, z_axis)
+        force_T = T*z_b_axis
         q_inv = self.q_inv(q)
         v_B = self.q_rot(q_inv, v)
         force_drag = -1*k_d*v_B + k_h*(v_B[0]**2 + v_B[1]**2)*np.array([.0, .0, 1])
         force_drag = self.q_rot(q, force_drag)
+        real_motor_velocity = ca.sqrt((T+1e-8)/motor_constant)
+        velocity_perpendicular_to_rotor_axis = v - v*z_b_axis
+        air_drag = -1*real_motor_velocity*rotor_drag_coefficient*velocity_perpendicular_to_rotor_axis
+        # f_expression=[v,
+        #               (force_T + force_drag)/self.m - np.array([.0, .0, self.g]),
+        #               1/2*self.q_muilty(q, ca.vertcat(0,w))]
+
         f_expression=[v,
-                      (force_T + force_drag)/self.m - np.array([.0, .0, self.g]),
+                      (force_T + air_drag)/self.m - np.array([.0, .0, self.g]),
                       1/2*self.q_muilty(q, ca.vertcat(0,w))]
-        
+
         f = ca.Function('f', [states, controls], f_expression, ['state', 'control_input'], ['d_p', 'd_v', 'd_q'])
 
         # acados model
@@ -58,13 +68,15 @@ class DroneModel(object):
         model.xdot = x_dot
         model.u = controls
         model.p = []
-        model.name = 'drone_simple'
+        model.name = 'drone_simple_drag'
 
         # constraint
-        constraint.w_max = 2*np.array([np.pi, np.pi, np.pi])
-        constraint.w_min = 2*np.array([-np.pi, -np.pi, -np.pi])
-        constraint.T_max = 34
-        constraint.T_min = 0
+        constraint.w_max = 1*np.array([np.pi, np.pi, np.pi])
+        constraint.w_min = 1*np.array([-np.pi, -np.pi, -np.pi])
+        constraint.T_max = 25.7544
+        # constraint.T_max = 68.3
+        # constraint.T_max = 70
+        constraint.T_min = 0.2336
 
         self.model = model
         self.constraint = constraint
