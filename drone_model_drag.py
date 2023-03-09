@@ -68,7 +68,7 @@ class DroneModel(object):
         model.xdot = x_dot
         model.u = controls
         model.p = []
-        model.name = 'drone_drag'
+        model.name = 'drone_simple_drag'
 
         # constraint
         constraint.w_max = 1*np.array([np.pi, np.pi, np.pi])

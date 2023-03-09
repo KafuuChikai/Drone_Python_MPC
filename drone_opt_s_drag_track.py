@@ -66,7 +66,7 @@ class DroneOptimizer(object):
         # Q = np.diag([200, 200, 500, 1, 1, 1, 5, 5, 200, 1, 1, 1])
         # R = np.diag([6, 6, 6, 6])
         Q = np.diag([200, 200, 500, 0, 0, 0, 5, 5, 200])
-        R = np.diag([0.5, 10, 10, 10])
+        R = np.diag([1, 30, 30, 30])
         ocp.cost.cost_type = 'LINEAR_LS'
         ocp.cost.cost_type_e = 'LINEAR_LS'
         ocp.cost.W = scipy.linalg.block_diag(Q, R)

@@ -16,8 +16,9 @@ class DroneModel(object):
         # self.I_yy = 2.1e-3
         # self.I_zz = 4.3e-3
         # self.I = np.array([[self.I_xx, .0, .0], [.0, self.I_yy, .0], [.0, .0, self.I_zz]])
-        self.m = 1.5
+        self.m = 1
         self.g = 9.8
+        self.TWR_max = 3
         z_axis = np.array([0,0,1])
         k_d = np.array([0.26, 0.28, 0.42])
         k_h = 0.01
@@ -73,10 +74,11 @@ class DroneModel(object):
         # constraint
         constraint.w_max = 1*np.array([np.pi, np.pi, np.pi])
         constraint.w_min = 1*np.array([-np.pi, -np.pi, -np.pi])
-        constraint.T_max = 25.7544
-        # constraint.T_max = 68.3
-        # constraint.T_max = 70
-        constraint.T_min = 0.2336
+        # constraint.T_max = 25.7544
+        # constraint.T_max = 68.3   #rot 1800, input 0.95
+        constraint.T_max = self.m * self.g * self.TWR_max   # rot 1200, input 0.929
+        # constraint.T_min = 0.2336     # rot 100
+        constraint.T_min = 1
 
         self.model = model
         self.constraint = constraint
