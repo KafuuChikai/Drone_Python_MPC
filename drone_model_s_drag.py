@@ -46,13 +46,14 @@ class DroneModel(object):
         real_motor_velocity = ca.sqrt((T+1e-8)/motor_constant)
         velocity_perpendicular_to_rotor_axis = v - v*z_b_axis
         air_drag = -1*real_motor_velocity*rotor_drag_coefficient*velocity_perpendicular_to_rotor_axis
-        # f_expression=[v,
-        #               (force_T + force_drag)/self.m - np.array([.0, .0, self.g]),
-        #               1/2*self.q_muilty(q, ca.vertcat(0,w))]
-
+        # paper drag
         f_expression=[v,
-                      (force_T + air_drag)/self.m - np.array([.0, .0, self.g]),
+                      (force_T + force_drag)/self.m - np.array([.0, .0, self.g]),
                       1/2*self.q_muilty(q, ca.vertcat(0,w))]
+        # gazebo drag
+        # f_expression=[v,
+        #               (force_T + air_drag)/self.m - np.array([.0, .0, self.g]),
+        #               1/2*self.q_muilty(q, ca.vertcat(0,w))]
 
         f = ca.Function('f', [states, controls], f_expression, ['state', 'control_input'], ['d_p', 'd_v', 'd_q'])
 
@@ -72,8 +73,12 @@ class DroneModel(object):
         model.name = 'drone_simple_drag'
 
         # constraint
-        constraint.w_max = 1*np.array([np.pi, np.pi, np.pi])
-        constraint.w_min = 1*np.array([-np.pi, -np.pi, -np.pi])
+        constraint.z_max = 100
+        constraint.z_min = 0.1
+        # constraint.w_max = 1*np.array([np.pi, np.pi, np.pi])
+        # constraint.w_min = -constraint.w_max
+        constraint.w_max = np.array([3, 3, 0.3])
+        constraint.w_min = -constraint.w_max
         # constraint.T_max = 25.7544
         # constraint.T_max = 68.3   #rot 1800, input 0.95
         constraint.T_max = self.m * self.g * self.TWR_max   # rot 1200, input 0.929

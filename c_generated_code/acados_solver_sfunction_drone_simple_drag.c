@@ -56,7 +56,7 @@ static void mdlInitializeSizes (SimStruct *S)
     ssSetNumDiscStates(S, 0);
 
     int N = DRONE_SIMPLE_DRAG_N;// specify the number of input ports
-    if ( !ssSetNumInputPorts(S, 7) )
+    if ( !ssSetNumInputPorts(S, 9) )
         return;
 
     // specify the number of output ports
@@ -69,15 +69,19 @@ static void mdlInitializeSizes (SimStruct *S)
     // ubx_0
     ssSetInputPortVectorDimension(S, 1, 10);
     // y_ref_0
-    ssSetInputPortVectorDimension(S, 2, 13);
+    ssSetInputPortVectorDimension(S, 2, 14);
     // y_ref
-    ssSetInputPortVectorDimension(S, 3, 247);
+    ssSetInputPortVectorDimension(S, 3, 266);
     // y_ref_e
-    ssSetInputPortVectorDimension(S, 4, 9);
+    ssSetInputPortVectorDimension(S, 4, 10);
+    // lbx
+    ssSetInputPortVectorDimension(S, 5, 19);
+    // ubx
+    ssSetInputPortVectorDimension(S, 6, 19);
     // lbu
-    ssSetInputPortVectorDimension(S, 5, 80);
+    ssSetInputPortVectorDimension(S, 7, 80);
     // ubu
-    ssSetInputPortVectorDimension(S, 6, 80);/* specify dimension information for the OUTPUT ports */
+    ssSetInputPortVectorDimension(S, 8, 80);/* specify dimension information for the OUTPUT ports */
     ssSetOutputPortVectorDimension(S, 0, 4 );
     ssSetOutputPortVectorDimension(S, 1, 1 );
     ssSetOutputPortVectorDimension(S, 2, 1 );
@@ -94,6 +98,8 @@ static void mdlInitializeSizes (SimStruct *S)
     ssSetInputPortDirectFeedThrough(S, 4, 1);
     ssSetInputPortDirectFeedThrough(S, 5, 1);
     ssSetInputPortDirectFeedThrough(S, 6, 1);
+    ssSetInputPortDirectFeedThrough(S, 7, 1);
+    ssSetInputPortDirectFeedThrough(S, 8, 1);
 
     // one sample time
     ssSetNumSampleTimes(S, 1);
@@ -149,7 +155,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     int N = DRONE_SIMPLE_DRAG_N;      
 
     // local buffer
-    real_t buffer[13];
+    real_t buffer[14];
 
     /* go through inputs */
     // lbx_0
@@ -168,7 +174,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     // y_ref_0
     in_sign = ssGetInputPortRealSignalPtrs(S, 2);
 
-    for (int i = 0; i < 13; i++)
+    for (int i = 0; i < 14; i++)
         buffer[i] = (double)(*in_sign[i]);
 
     ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, 0, "yref", (void *) buffer);
@@ -179,8 +185,8 @@ static void mdlOutputs(SimStruct *S, int_T tid)
 
     for (int ii = 1; ii < N; ii++)
     {
-        for (int jj = 0; jj < 13; jj++)
-            buffer[jj] = (double)(*in_sign[(ii-1)*13+jj]);
+        for (int jj = 0; jj < 14; jj++)
+            buffer[jj] = (double)(*in_sign[(ii-1)*14+jj]);
         ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, ii, "yref", (void *) buffer);
     }
 
@@ -188,12 +194,28 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     // y_ref_e
     in_sign = ssGetInputPortRealSignalPtrs(S, 4);
 
-    for (int i = 0; i < 9; i++)
+    for (int i = 0; i < 10; i++)
         buffer[i] = (double)(*in_sign[i]);
 
     ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, N, "yref", (void *) buffer);
-    // lbu
+    // lbx
     in_sign = ssGetInputPortRealSignalPtrs(S, 5);
+    for (int ii = 1; ii < N; ii++)
+    {
+        for (int jj = 0; jj < 1; jj++)
+            buffer[jj] = (double)(*in_sign[(ii-1)*1+jj]);
+        ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "lbx", (void *) buffer);
+    }
+    // ubx
+    in_sign = ssGetInputPortRealSignalPtrs(S, 6);
+    for (int ii = 1; ii < N; ii++)
+    {
+        for (int jj = 0; jj < 1; jj++)
+            buffer[jj] = (double)(*in_sign[(ii-1)*1+jj]);
+        ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "ubx", (void *) buffer);
+    }
+    // lbu
+    in_sign = ssGetInputPortRealSignalPtrs(S, 7);
     for (int ii = 0; ii < N; ii++)
     {
         for (int jj = 0; jj < 4; jj++)
@@ -201,7 +223,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
         ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "lbu", (void *) buffer);
     }
     // ubu
-    in_sign = ssGetInputPortRealSignalPtrs(S, 6);
+    in_sign = ssGetInputPortRealSignalPtrs(S, 8);
     for (int ii = 0; ii < N; ii++)
     {
         for (int jj = 0; jj < 4; jj++)

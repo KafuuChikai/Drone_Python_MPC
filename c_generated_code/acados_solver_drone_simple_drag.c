@@ -393,13 +393,17 @@ void drone_simple_drag_acados_create_5_set_nlp_in(drone_simple_drag_solver_capsu
     W_0[0+(NY0) * 0] = 200;
     W_0[1+(NY0) * 1] = 200;
     W_0[2+(NY0) * 2] = 500;
+    W_0[3+(NY0) * 3] = 1;
+    W_0[4+(NY0) * 4] = 1;
+    W_0[5+(NY0) * 5] = 1;
     W_0[6+(NY0) * 6] = 5;
     W_0[7+(NY0) * 7] = 5;
-    W_0[8+(NY0) * 8] = 200;
-    W_0[9+(NY0) * 9] = 1;
-    W_0[10+(NY0) * 10] = 30;
+    W_0[8+(NY0) * 8] = 5;
+    W_0[9+(NY0) * 9] = 200;
+    W_0[10+(NY0) * 10] = 6;
     W_0[11+(NY0) * 11] = 30;
     W_0[12+(NY0) * 12] = 30;
+    W_0[13+(NY0) * 13] = 30;
     ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, 0, "W", W_0);
     free(W_0);
     double* W = calloc(NY*NY, sizeof(double));
@@ -407,13 +411,17 @@ void drone_simple_drag_acados_create_5_set_nlp_in(drone_simple_drag_solver_capsu
     W[0+(NY) * 0] = 200;
     W[1+(NY) * 1] = 200;
     W[2+(NY) * 2] = 500;
+    W[3+(NY) * 3] = 1;
+    W[4+(NY) * 4] = 1;
+    W[5+(NY) * 5] = 1;
     W[6+(NY) * 6] = 5;
     W[7+(NY) * 7] = 5;
-    W[8+(NY) * 8] = 200;
-    W[9+(NY) * 9] = 1;
-    W[10+(NY) * 10] = 30;
+    W[8+(NY) * 8] = 5;
+    W[9+(NY) * 9] = 200;
+    W[10+(NY) * 10] = 6;
     W[11+(NY) * 11] = 30;
     W[12+(NY) * 12] = 30;
+    W[13+(NY) * 13] = 30;
 
     for (int i = 1; i < N; i++)
     {
@@ -425,9 +433,13 @@ void drone_simple_drag_acados_create_5_set_nlp_in(drone_simple_drag_solver_capsu
     W_e[0+(NYN) * 0] = 200;
     W_e[1+(NYN) * 1] = 200;
     W_e[2+(NYN) * 2] = 500;
+    W_e[3+(NYN) * 3] = 1;
+    W_e[4+(NYN) * 4] = 1;
+    W_e[5+(NYN) * 5] = 1;
     W_e[6+(NYN) * 6] = 5;
     W_e[7+(NYN) * 7] = 5;
-    W_e[8+(NYN) * 8] = 200;
+    W_e[8+(NYN) * 8] = 5;
+    W_e[9+(NYN) * 9] = 200;
     ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, N, "W", W_e);
     free(W_e);
     double* Vx_0 = calloc(NY0*NX, sizeof(double));
@@ -438,17 +450,18 @@ void drone_simple_drag_acados_create_5_set_nlp_in(drone_simple_drag_solver_capsu
     Vx_0[3+(NY0) * 3] = 1;
     Vx_0[4+(NY0) * 4] = 1;
     Vx_0[5+(NY0) * 5] = 1;
-    Vx_0[6+(NY0) * 7] = 1;
-    Vx_0[7+(NY0) * 8] = 1;
-    Vx_0[8+(NY0) * 9] = 1;
+    Vx_0[6+(NY0) * 6] = 1;
+    Vx_0[7+(NY0) * 7] = 1;
+    Vx_0[8+(NY0) * 8] = 1;
+    Vx_0[9+(NY0) * 9] = 1;
     ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, 0, "Vx", Vx_0);
     free(Vx_0);
     double* Vu_0 = calloc(NY0*NU, sizeof(double));
     // change only the non-zero elements:
-    Vu_0[9+(NY0) * 0] = 1;
-    Vu_0[10+(NY0) * 1] = 1;
-    Vu_0[11+(NY0) * 2] = 1;
-    Vu_0[12+(NY0) * 3] = 1;
+    Vu_0[10+(NY0) * 0] = 1;
+    Vu_0[11+(NY0) * 1] = 1;
+    Vu_0[12+(NY0) * 2] = 1;
+    Vu_0[13+(NY0) * 3] = 1;
     ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, 0, "Vu", Vu_0);
     free(Vu_0);
     double* Vx = calloc(NY*NX, sizeof(double));
@@ -459,9 +472,10 @@ void drone_simple_drag_acados_create_5_set_nlp_in(drone_simple_drag_solver_capsu
     Vx[3+(NY) * 3] = 1;
     Vx[4+(NY) * 4] = 1;
     Vx[5+(NY) * 5] = 1;
-    Vx[6+(NY) * 7] = 1;
-    Vx[7+(NY) * 8] = 1;
-    Vx[8+(NY) * 9] = 1;
+    Vx[6+(NY) * 6] = 1;
+    Vx[7+(NY) * 7] = 1;
+    Vx[8+(NY) * 8] = 1;
+    Vx[9+(NY) * 9] = 1;
     for (int i = 1; i < N; i++)
     {
         ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, i, "Vx", Vx);
@@ -472,10 +486,10 @@ void drone_simple_drag_acados_create_5_set_nlp_in(drone_simple_drag_solver_capsu
     double* Vu = calloc(NY*NU, sizeof(double));
     // change only the non-zero elements:
     
-    Vu[9+(NY) * 0] = 1;
-    Vu[10+(NY) * 1] = 1;
-    Vu[11+(NY) * 2] = 1;
-    Vu[12+(NY) * 3] = 1;
+    Vu[10+(NY) * 0] = 1;
+    Vu[11+(NY) * 1] = 1;
+    Vu[12+(NY) * 2] = 1;
+    Vu[13+(NY) * 3] = 1;
 
     for (int i = 1; i < N; i++)
     {
@@ -491,9 +505,10 @@ void drone_simple_drag_acados_create_5_set_nlp_in(drone_simple_drag_solver_capsu
     Vx_e[3+(NYN) * 3] = 1;
     Vx_e[4+(NYN) * 4] = 1;
     Vx_e[5+(NYN) * 5] = 1;
-    Vx_e[6+(NYN) * 7] = 1;
-    Vx_e[7+(NYN) * 8] = 1;
-    Vx_e[8+(NYN) * 9] = 1;
+    Vx_e[6+(NYN) * 6] = 1;
+    Vx_e[7+(NYN) * 7] = 1;
+    Vx_e[8+(NYN) * 8] = 1;
+    Vx_e[9+(NYN) * 9] = 1;
     ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, N, "Vx", Vx_e);
     free(Vx_e);
 
@@ -557,12 +572,12 @@ void drone_simple_drag_acados_create_5_set_nlp_in(drone_simple_drag_solver_capsu
     
     lbu[0] = 1;
     ubu[0] = 29.4;
-    lbu[1] = -3.141592653589793;
-    ubu[1] = 3.141592653589793;
-    lbu[2] = -3.141592653589793;
-    ubu[2] = 3.141592653589793;
-    lbu[3] = -3.141592653589793;
-    ubu[3] = 3.141592653589793;
+    lbu[1] = -3;
+    ubu[1] = 3;
+    lbu[2] = -3;
+    ubu[2] = 3;
+    lbu[3] = -0.3;
+    ubu[3] = 0.3;
 
     for (int i = 0; i < N; i++)
     {
@@ -580,6 +595,25 @@ void drone_simple_drag_acados_create_5_set_nlp_in(drone_simple_drag_solver_capsu
 
 
 
+    // x
+    int* idxbx = malloc(NBX * sizeof(int));
+    
+    idxbx[0] = 2;
+    double* lubx = calloc(2*NBX, sizeof(double));
+    double* lbx = lubx;
+    double* ubx = lubx + NBX;
+    
+    lbx[0] = 0.1;
+    ubx[0] = 100;
+
+    for (int i = 1; i < N; i++)
+    {
+        ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, i, "idxbx", idxbx);
+        ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, i, "lbx", lbx);
+        ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, i, "ubx", ubx);
+    }
+    free(idxbx);
+    free(lubx);
 
 
 
