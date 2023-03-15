@@ -64,9 +64,9 @@
 #define DRONE_SIMPLE_DRAG_NY     14
 #define DRONE_SIMPLE_DRAG_NYN    10
 #define DRONE_SIMPLE_DRAG_N      20
-#define DRONE_SIMPLE_DRAG_NH     1
+#define DRONE_SIMPLE_DRAG_NH     0
 #define DRONE_SIMPLE_DRAG_NPHI   0
-#define DRONE_SIMPLE_DRAG_NHN    1
+#define DRONE_SIMPLE_DRAG_NHN    0
 #define DRONE_SIMPLE_DRAG_NPHIN  0
 #define DRONE_SIMPLE_DRAG_NR     0
 
@@ -108,13 +108,9 @@ typedef struct drone_simple_drag_solver_capsule
 
 
     // constraints
-    external_function_param_casadi *nl_constr_h_fun_jac;
-    external_function_param_casadi *nl_constr_h_fun;
 
 
 
-    external_function_param_casadi nl_constr_h_e_fun_jac;
-    external_function_param_casadi nl_constr_h_e_fun;
 
 } drone_simple_drag_solver_capsule;
 

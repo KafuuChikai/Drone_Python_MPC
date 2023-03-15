@@ -7,7 +7,7 @@ import shutil
 import errno
 import timeit
 
-from drone_model_drag import DroneModel
+from drone_model_s_drag_delay import DroneModel
 from acados_template import AcadosOcp, AcadosOcpSolver, AcadosSimSolver
 
 import numpy as np
@@ -63,32 +63,45 @@ class DroneOptimizer(object):
         ocp.parameter_values = np.zeros(n_params)
 
         # cost
-        # Q = np.diag([200, 200, 500, 1, 1, 1, 5, 5, 200, 1, 1, 1])
-        # R = np.diag([6, 6, 6, 6])
-        Q = np.diag([200, 200, 500, 0, 0, 0, 5, 5, 200])
-        R = np.diag([0.5, 10, 10, 10])
+        # Q = np.diag([200, 200, 500, 1, 1, 1, 5, 5, 5, 200])
+        # R = np.diag([6, 30, 30, 30])
+        Q = np.diag([200, 200, 500, 0, 0, 0, 0, 0, 0, 0])
+        # R = np.diag([0.5, 18, 18, 18])
+        # R = np.diag([0.05, 18, 18, 18])
+        R = np.diag([0, 0, 0, 0])
         ocp.cost.cost_type = 'LINEAR_LS'
         ocp.cost.cost_type_e = 'LINEAR_LS'
         ocp.cost.W = scipy.linalg.block_diag(Q, R)
         ocp.cost.W_e = Q
         
-        # q(x,y,z) -> dim: ny-1
+        # q(w,x,y,z)
         # Vx
-        ocp.cost.Vx = np.zeros(((ny-1), nx))
-        ocp.cost.Vx[:6, :6] = np.eye(6)
-        ocp.cost.Vx[6:9, 7:10] = np.eye(3)
-        ocp.cost.Vx_e = ocp.cost.Vx[:(nx-1), :nx]
+        ocp.cost.Vx = np.zeros((ny-4, nx))
+        # ocp.cost.Vx = np.zeros((ny-1, nx))
+        ocp.cost.Vx[:nx-4, :nx-4] = np.eye(nx-4)
+        # ocp.cost.Vx[:6, :6] = np.eye(6)
+        # ocp.cost.Vx[6:nx-1, 7:10] = np.eye(3)
+        ocp.cost.Vx_e = ocp.cost.Vx[:nx-4, :nx]
+        # ocp.cost.Vx_e = ocp.cost.Vx[:nx-1, :nx]
         # Vu
-        ocp.cost.Vu = np.zeros(((ny-1), nu))
+        ocp.cost.Vu = np.zeros((ny-4, nu))
+        # ocp.cost.Vu = np.zeros((ny-1, nu))
         ocp.cost.Vu[-nu:, -nu:] = np.eye(nu)
 
         # set constraints
         # ocp.constraints.lbx = np.array([-6,-6,-6])
         # ocp.constraints.ubx = np.array([6,6,6])
+        ocp.constraints.lbx = np.array([d_constraint.z_min])
+        ocp.constraints.ubx = np.array([d_constraint.z_max])
         # ocp.constraints.idxbx = np.array([0,1,2])
+        ocp.constraints.idxbx = np.array([2])
         ocp.constraints.lbu = np.concatenate((np.array([d_constraint.T_min]), d_constraint.w_min))
         ocp.constraints.ubu = np.concatenate((np.array([d_constraint.T_max]), d_constraint.w_max))
         ocp.constraints.idxbu = np.array(range(nu))
+        # ocp.constraints.lh = np.array([d_constraint.psi_min])
+        # ocp.constraints.uh = np.array([d_constraint.psi_max])
+        # ocp.constraints.lh_e = np.array([d_constraint.psi_min])
+        # ocp.constraints.uh_e = np.array([d_constraint.psi_max])
 
         # initial state
         x_init = np.zeros(nx)
@@ -97,7 +110,8 @@ class DroneOptimizer(object):
         
         # initial ref
         u_ref = np.zeros(nu)        
-        x_ref = np.zeros(nx-1)
+        x_ref = np.zeros(nx-4)
+        # x_ref = np.zeros(nx-1)
         ocp.cost.yref = np.concatenate((x_ref, u_ref))
         ocp.cost.yref_e = x_ref
 
@@ -119,8 +133,8 @@ class DroneOptimizer(object):
     def simulation(self, T_max, a_max, v_max, n):
         p0, q0 = self.track_cal(0, a_max, v_max, n)
         v0 = np.array([0, 0, 0])
-        # q0 = np.array([1, 0, 0, 0])
-        x0 = np.concatenate((p0, v0, q0))
+        q0 = np.array([1, 0, 0, 0])
+        x0 = np.concatenate((p0, v0, q0, np.zeros(4)))
         
         Nsim = int(T_max * self.N / self.T)
         Tsim = 0
@@ -142,16 +156,18 @@ class DroneOptimizer(object):
                 # simTrack[i+j, :] = track_ref
                 simTrack[i+j, 0:3] = p_ref
                 simTrack[i+j, 3:7] = q_ref
-                # yref_between = np.concatenate((track_ref, np.zeros(6), np.zeros(self.nu)))
-                yref_between = np.concatenate((p_ref, np.zeros(3), q_ref[1:4], np.zeros(self.nu)))              
+                yref_between = np.concatenate((p_ref, np.zeros(7), np.zeros(self.nu)))
+                # yref_between = np.concatenate((p_ref, np.zeros(3), q_ref, np.zeros(self.nu)))
+                # yref_between = np.concatenate((p_ref, np.zeros(3), q_ref[1:4], np.zeros(self.nu)))              
                 self.solver.set(j, 'yref', yref_between)
             # track_ref_N = self.track_cal(Tsim + self.T, a_max, v_max, n)
             p_ref_N, q_ref_N = self.track_cal(Tsim + self.T, a_max, v_max, n)
             # simTrack[i+self.N, :] = track_ref_N
             simTrack[i+self.N, 0:3] = p_ref_N
             simTrack[i+self.N, 3:7] = q_ref_N
-            # yref_N = np.concatenate((track_ref_N, np.zeros(6)))
-            yref_N = np.concatenate((p_ref_N, np.zeros(3), q_ref_N[1:4]))
+            yref_N = np.concatenate((p_ref_N, np.zeros(7)))
+            # yref_N = np.concatenate((p_ref_N, np.zeros(3), q_ref_N))
+            # yref_N = np.concatenate((p_ref_N, np.zeros(3), q_ref_N[1:4]))
             # yref_N = np.concatenate((p0, np.zeros(6)))
             self.solver.set(self.N, 'yref', yref_N)
             
@@ -191,7 +207,7 @@ class DroneOptimizer(object):
         r_max = v_max**2/a_max
         k = a_max/v_max
         r_min = r_max/n
-        pos_proc = np.array([r_max*np.sin(k*t), r_min*np.cos(k*t), -5])
+        pos_proc = np.array([r_max*np.sin(k*t), r_min*np.cos(k*t), 5])
         psi = k*t + np.pi/2
         q_proc = self.euler2quatern(np.array([-np.pi/4, 0, psi]))
         return pos_proc, q_proc
@@ -212,4 +228,4 @@ if __name__ == '__main__':
     drone_model = DroneModel()
     opt = DroneOptimizer(d_model=drone_model.model,
                                d_constraint=drone_model.constraint, t_horizon=1, n_nodes=20)
-    opt.simulation(T_max=20, a_max=20, v_max=10, n=2)
+    opt.simulation(T_max=1, a_max=20, v_max=10, n=2)

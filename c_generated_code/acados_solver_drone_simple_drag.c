@@ -45,10 +45,6 @@
 
 
 
-#include "drone_simple_drag_constraints/drone_simple_drag_h_constraint.h"
-
-
-#include "drone_simple_drag_constraints/drone_simple_drag_h_e_constraint.h"
 
 
 
@@ -278,8 +274,6 @@ ocp_nlp_dims* drone_simple_drag_acados_create_2_create_and_set_dimensions(drone_
 
     for (int i = 0; i < N; i++)
     {
-        ocp_nlp_dims_set_constraints(nlp_config, nlp_dims, i, "nh", &nh[i]);
-        ocp_nlp_dims_set_constraints(nlp_config, nlp_dims, i, "nsh", &nsh[i]);
     }
     ocp_nlp_dims_set_constraints(nlp_config, nlp_dims, N, "nh", &nh[N]);
     ocp_nlp_dims_set_constraints(nlp_config, nlp_dims, N, "nsh", &nsh[N]);
@@ -312,19 +306,6 @@ void drone_simple_drag_acados_create_3_create_and_set_functions(drone_simple_dra
     }while(false)
 
 
-    // constraints.constr_type == "BGH" and dims.nh > 0
-    capsule->nl_constr_h_fun_jac = (external_function_param_casadi *) malloc(sizeof(external_function_param_casadi)*N);
-    for (int i = 0; i < N; i++) {
-        MAP_CASADI_FNC(nl_constr_h_fun_jac[i], drone_simple_drag_constr_h_fun_jac_uxt_zt);
-    }
-    capsule->nl_constr_h_fun = (external_function_param_casadi *) malloc(sizeof(external_function_param_casadi)*N);
-    for (int i = 0; i < N; i++) {
-        MAP_CASADI_FNC(nl_constr_h_fun[i], drone_simple_drag_constr_h_fun);
-    }
-    
-
-    MAP_CASADI_FNC(nl_constr_h_e_fun_jac, drone_simple_drag_constr_h_e_fun_jac_uxt_zt);
-    MAP_CASADI_FNC(nl_constr_h_e_fun, drone_simple_drag_constr_h_e_fun);
 
 
     // explicit ode
@@ -616,29 +597,6 @@ void drone_simple_drag_acados_create_5_set_nlp_in(drone_simple_drag_solver_capsu
 
 
 
-    // set up nonlinear constraints for stage 0 to N-1
-    double* luh = calloc(2*NH, sizeof(double));
-    double* lh = luh;
-    double* uh = luh + NH;
-
-    
-    lh[0] = -16331239353195370;
-
-    
-    uh[0] = 16331239353195370;
-
-    for (int i = 0; i < N; i++)
-    {
-        // nonlinear constraints for stages 0 to N-1
-        ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, i, "nl_constr_h_fun_jac",
-                                      &capsule->nl_constr_h_fun_jac[i]);
-        ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, i, "nl_constr_h_fun",
-                                      &capsule->nl_constr_h_fun[i]);
-        
-        ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, i, "lh", lh);
-        ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, i, "uh", uh);
-    }
-    free(luh);
 
 
 
@@ -656,22 +614,6 @@ void drone_simple_drag_acados_create_5_set_nlp_in(drone_simple_drag_solver_capsu
 
 
 
-    // set up nonlinear constraints for last stage
-    double* luh_e = calloc(2*NHN, sizeof(double));
-    double* lh_e = luh_e;
-    double* uh_e = luh_e + NHN;
-    
-    lh_e[0] = -16331239353195370;
-
-    
-    uh_e[0] = 16331239353195370;
-
-    ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, N, "nl_constr_h_fun_jac", &capsule->nl_constr_h_e_fun_jac);
-    ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, N, "nl_constr_h_fun", &capsule->nl_constr_h_e_fun);
-    
-    ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, N, "lh", lh_e);
-    ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, N, "uh", uh_e);
-    free(luh_e);
 
 
 }
@@ -956,8 +898,6 @@ int drone_simple_drag_acados_update_params(drone_simple_drag_solver_capsule* cap
 
         // constraints
     
-        capsule->nl_constr_h_fun_jac[stage].set_param(capsule->nl_constr_h_fun_jac+stage, p);
-        capsule->nl_constr_h_fun[stage].set_param(capsule->nl_constr_h_fun+stage, p);
 
         // cost
         if (stage == 0)
@@ -973,9 +913,6 @@ int drone_simple_drag_acados_update_params(drone_simple_drag_solver_capsule* cap
         // terminal shooting node has no dynamics
         // cost
         // constraints
-    
-        capsule->nl_constr_h_e_fun_jac.set_param(&capsule->nl_constr_h_e_fun_jac, p);
-        capsule->nl_constr_h_e_fun.set_param(&capsule->nl_constr_h_e_fun, p);
     
     }
 
@@ -1042,15 +979,6 @@ int drone_simple_drag_acados_free(drone_simple_drag_solver_capsule* capsule)
     // cost
 
     // constraints
-    for (int i = 0; i < N; i++)
-    {
-        external_function_param_casadi_free(&capsule->nl_constr_h_fun_jac[i]);
-        external_function_param_casadi_free(&capsule->nl_constr_h_fun[i]);
-    }
-    free(capsule->nl_constr_h_fun_jac);
-    free(capsule->nl_constr_h_fun);
-    external_function_param_casadi_free(&capsule->nl_constr_h_e_fun_jac);
-    external_function_param_casadi_free(&capsule->nl_constr_h_e_fun);
 
     return 0;
 }

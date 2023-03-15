@@ -97,10 +97,10 @@ class DroneOptimizer(object):
         ocp.constraints.lbu = np.concatenate((np.array([d_constraint.T_min]), d_constraint.w_min))
         ocp.constraints.ubu = np.concatenate((np.array([d_constraint.T_max]), d_constraint.w_max))
         ocp.constraints.idxbu = np.array(range(nu))
-        ocp.constraints.lh = np.array([d_constraint.psi_min])
-        ocp.constraints.uh = np.array([d_constraint.psi_max])
-        ocp.constraints.lh_e = np.array([d_constraint.psi_min])
-        ocp.constraints.uh_e = np.array([d_constraint.psi_max])
+        # ocp.constraints.lh = np.array([d_constraint.psi_min])
+        # ocp.constraints.uh = np.array([d_constraint.psi_max])
+        # ocp.constraints.lh_e = np.array([d_constraint.psi_min])
+        # ocp.constraints.uh_e = np.array([d_constraint.psi_max])
 
         # initial state
         x_init = np.zeros(nx)
