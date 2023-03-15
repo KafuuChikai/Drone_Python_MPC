@@ -18,7 +18,7 @@ class DroneModel(object):
         # self.I = np.array([[self.I_xx, .0, .0], [.0, self.I_yy, .0], [.0, .0, self.I_zz]])
         self.m = 1
         self.g = 9.8
-        self.TWR_max = 3
+        self.TWR_max = 5
         z_axis = np.array([0,0,1])
         k_d = np.array([0.26, 0.28, 0.42])
         k_h = 0.01
@@ -35,7 +35,13 @@ class DroneModel(object):
         v = ca.MX.sym('v',3)    # velocity
         q = ca.MX.sym('q',4)    # rotation        
         states = ca.vertcat(p, v, q)        
-        
+
+        # constraint function
+        phi_constraint = 2*(q[0]*q[1] + q[2]*q[3]) / (1-2*(q[1]*q[1] + q[2]*q[2]))
+        theta_constraint = 2*(q[0]*q[2] - q[1]*q[3])
+        psi_constraint = 2*(q[0]*q[3] + q[1]*q[2])/ (1-2*(q[2]*q[2] + q[3]*q[3]))
+        attitude_constraint = ca.vertcat(phi_constraint, theta_constraint, psi_constraint)
+
         # function
         z_b_axis = self.q_rot(q, z_axis)
         force_T = T*z_b_axis
@@ -66,6 +72,8 @@ class DroneModel(object):
 
         model.f_expl_expr = ca.vcat(f(states, controls))
         model.f_impl_expr = f_impl
+        # model.con_h_expr = psi_constraint
+        # model.con_h_expr_e = psi_constraint
         model.x = states
         model.xdot = x_dot
         model.u = controls
@@ -77,13 +85,15 @@ class DroneModel(object):
         constraint.z_min = 0.1
         # constraint.w_max = 1*np.array([np.pi, np.pi, np.pi])
         # constraint.w_min = -constraint.w_max
-        constraint.w_max = np.array([3, 3, 0.3])
+        constraint.w_max = np.array([5, 5, 0.3])
         constraint.w_min = -constraint.w_max
         # constraint.T_max = 25.7544
         # constraint.T_max = 68.3   #rot 1800, input 0.95
         constraint.T_max = self.m * self.g * self.TWR_max   # rot 1200, input 0.929
         # constraint.T_min = 0.2336     # rot 100
-        constraint.T_min = 1
+        constraint.T_min = 4
+        # constraint.psi_max = np.tan(np.pi / 2)
+        # constraint.psi_min = -constraint.psi_max
 
         self.model = model
         self.constraint = constraint
