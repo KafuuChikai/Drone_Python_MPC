@@ -84,17 +84,17 @@ fprintf('\n\nNote: Usage of Sfunction is as follows:\n')
 input_note = 'Inputs are:\n';
 i_in = 1;
 input_note = strcat(input_note, num2str(i_in), ') lbx_0 - lower bound on x for stage 0,',...
-                    ' size [10]\n ');
+                    ' size [13]\n ');
 i_in = i_in + 1;
 input_note = strcat(input_note, num2str(i_in), ') ubx_0 - upper bound on x for stage 0,',...
-                    ' size [10]\n ');
+                    ' size [13]\n ');
 i_in = i_in + 1;
-input_note = strcat(input_note, num2str(i_in), ') y_ref_0, size [14]\n ');
+input_note = strcat(input_note, num2str(i_in), ') y_ref_0, size [17]\n ');
 i_in = i_in + 1;
 input_note = strcat(input_note, num2str(i_in), ') y_ref - concatenated for shooting nodes 1 to N-1,',...
-                    ' size [266]\n ');
+                    ' size [323]\n ');
 i_in = i_in + 1;
-input_note = strcat(input_note, num2str(i_in), ') y_ref_e, size [10]\n ');
+input_note = strcat(input_note, num2str(i_in), ') y_ref_e, size [13]\n ');
 i_in = i_in + 1;
 input_note = strcat(input_note, num2str(i_in), ') lbx for shooting nodes 1 to N-1, size [19]\n ');
 i_in = i_in + 1;

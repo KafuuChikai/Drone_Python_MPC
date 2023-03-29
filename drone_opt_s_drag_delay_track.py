@@ -65,10 +65,12 @@ class DroneOptimizer(object):
         # cost
         # Q = np.diag([200, 200, 500, 1, 1, 1, 5, 5, 5, 200])
         # R = np.diag([6, 30, 30, 30])
-        Q = np.diag([200, 200, 500, 0, 0, 0, 0, 0, 0, 0])
+        # Q = np.diag([2000, 2000, 5000, 1, 1, 1, 5, 5, 5, 2000, 30, 30, 30])
+        Q = np.diag([2000, 2000, 5000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
         # R = np.diag([0.5, 18, 18, 18])
         # R = np.diag([0.05, 18, 18, 18])
-        R = np.diag([0, 0, 0, 0])
+        # R = np.diag([30, 10, 10, 10])
+        R = np.diag([0, 10, 10, 10])
         ocp.cost.cost_type = 'LINEAR_LS'
         ocp.cost.cost_type_e = 'LINEAR_LS'
         ocp.cost.W = scipy.linalg.block_diag(Q, R)
@@ -76,15 +78,15 @@ class DroneOptimizer(object):
         
         # q(w,x,y,z)
         # Vx
-        ocp.cost.Vx = np.zeros((ny-4, nx))
+        ocp.cost.Vx = np.zeros((ny, nx))
         # ocp.cost.Vx = np.zeros((ny-1, nx))
-        ocp.cost.Vx[:nx-4, :nx-4] = np.eye(nx-4)
+        ocp.cost.Vx[:nx, :nx] = np.eye(nx)
         # ocp.cost.Vx[:6, :6] = np.eye(6)
         # ocp.cost.Vx[6:nx-1, 7:10] = np.eye(3)
-        ocp.cost.Vx_e = ocp.cost.Vx[:nx-4, :nx]
+        ocp.cost.Vx_e = ocp.cost.Vx[:nx, :nx]
         # ocp.cost.Vx_e = ocp.cost.Vx[:nx-1, :nx]
         # Vu
-        ocp.cost.Vu = np.zeros((ny-4, nu))
+        ocp.cost.Vu = np.zeros((ny, nu))
         # ocp.cost.Vu = np.zeros((ny-1, nu))
         ocp.cost.Vu[-nu:, -nu:] = np.eye(nu)
 
@@ -110,7 +112,7 @@ class DroneOptimizer(object):
         
         # initial ref
         u_ref = np.zeros(nu)        
-        x_ref = np.zeros(nx-4)
+        x_ref = np.zeros(nx)
         # x_ref = np.zeros(nx-1)
         ocp.cost.yref = np.concatenate((x_ref, u_ref))
         ocp.cost.yref_e = x_ref
@@ -134,7 +136,7 @@ class DroneOptimizer(object):
         p0, q0 = self.track_cal(0, a_max, v_max, n)
         v0 = np.array([0, 0, 0])
         q0 = np.array([1, 0, 0, 0])
-        x0 = np.concatenate((p0, v0, q0, np.zeros(4)))
+        x0 = np.concatenate((p0, v0, q0, np.zeros(3)))
         
         Nsim = int(T_max * self.N / self.T)
         Tsim = 0
@@ -156,7 +158,7 @@ class DroneOptimizer(object):
                 # simTrack[i+j, :] = track_ref
                 simTrack[i+j, 0:3] = p_ref
                 simTrack[i+j, 3:7] = q_ref
-                yref_between = np.concatenate((p_ref, np.zeros(7), np.zeros(self.nu)))
+                yref_between = np.concatenate((p_ref, np.zeros(10), np.zeros(self.nu)))
                 # yref_between = np.concatenate((p_ref, np.zeros(3), q_ref, np.zeros(self.nu)))
                 # yref_between = np.concatenate((p_ref, np.zeros(3), q_ref[1:4], np.zeros(self.nu)))              
                 self.solver.set(j, 'yref', yref_between)
@@ -165,7 +167,7 @@ class DroneOptimizer(object):
             # simTrack[i+self.N, :] = track_ref_N
             simTrack[i+self.N, 0:3] = p_ref_N
             simTrack[i+self.N, 3:7] = q_ref_N
-            yref_N = np.concatenate((p_ref_N, np.zeros(7)))
+            yref_N = np.concatenate((p_ref_N, np.zeros(10)))
             # yref_N = np.concatenate((p_ref_N, np.zeros(3), q_ref_N))
             # yref_N = np.concatenate((p_ref_N, np.zeros(3), q_ref_N[1:4]))
             # yref_N = np.concatenate((p0, np.zeros(6)))
