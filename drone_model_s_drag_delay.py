@@ -32,10 +32,7 @@ class DroneModel(object):
         # k_d = np.array([0.5173, 0.5305, -0.1427])
         # k_h = -0.0527
         # k_h2 = -0.1149
-        motor_constant = 5.84e-6
-        rotor_drag_coefficient = 0.000175
         kw = 20  # rate delay
-        kT = 10  # thrust delay
         
         # control input(delay)
         T_in = ca.MX.sym('thrust',1)
@@ -65,25 +62,11 @@ class DroneModel(object):
         v_B = self.q_rot(q_inv, v)
         force_drag = -1*k_d*v_B + (k_h*(v_B[0]*v_B[0] + v_B[1]*v_B[1])+k_h2*v_B[2]*v_B[2])*np.array([.0, .0, 1])
         force_drag = self.q_rot(q, force_drag)
-        # force_drag = 0  # test no drag
-        real_motor_velocity = ca.sqrt((T+1e-8)/motor_constant)
-        velocity_perpendicular_to_rotor_axis = v - v*z_b_axis
-        air_drag = -1*real_motor_velocity*rotor_drag_coefficient*velocity_perpendicular_to_rotor_axis
         # paper drag
-        # f_expression=[v,
-        #               (force_T + force_drag)/self.m - np.array([.0, .0, self.g]),
-        #               1/2*self.q_muilty(q, ca.vertcat(0,w)),
-        #               kw*(w_in - w),
-        #               kT*(T_in - T)]
         f_expression=[v,
                       (force_T + force_drag)/self.m - np.array([.0, .0, self.g]),
                       1/2*self.q_muilty(q, ca.vertcat(0,w)),
                       kw*(w_in - w)]
-
-        # gazebo drag
-        # f_expression=[v,
-        #               (force_T + air_drag)/self.m - np.array([.0, .0, self.g]),
-        #               1/2*self.q_muilty(q, ca.vertcat(0,w))]
 
         # f = ca.Function('f', [states, controls], f_expression, ['state', 'control_input'], ['d_p', 'd_v', 'd_q', 'd_w', 'd_T'])
         f = ca.Function('f', [states, controls], f_expression, ['state', 'control_input'], ['d_p', 'd_v', 'd_q', 'd_w'])
