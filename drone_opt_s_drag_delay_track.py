@@ -65,12 +65,12 @@ class DroneOptimizer(object):
         # cost
         # Q = np.diag([200, 200, 500, 1, 1, 1, 5, 5, 5, 200])
         # R = np.diag([6, 30, 30, 30])
-        Q = np.diag([2000, 2000, 5000, 1, 1, 1, 5, 5, 5, 2000, 30, 30, 30])
-        # Q = np.diag([2000, 2000, 5000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+        # Q = np.diag([2000, 2000, 5000, 1, 1, 1, 5, 5, 5, 2000, 30, 30, 30, 0])
+        Q = np.diag([2000, 2000, 5000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30])
         # R = np.diag([0.5, 18, 18, 18])
         # R = np.diag([0.05, 18, 18, 18])
-        R = np.diag([30, 10, 10, 10])
-        # R = np.diag([0, 10, 10, 10])
+        # R = np.diag([30, 10, 10, 10])
+        R = np.diag([0, 10, 10, 10])
         ocp.cost.cost_type = 'LINEAR_LS'
         ocp.cost.cost_type_e = 'LINEAR_LS'
         ocp.cost.W = scipy.linalg.block_diag(Q, R)
@@ -93,12 +93,17 @@ class DroneOptimizer(object):
         # set constraints
         # ocp.constraints.lbx = np.array([-6,-6,-6])
         # ocp.constraints.ubx = np.array([6,6,6])
-        ocp.constraints.lbx = np.array([d_constraint.z_min])
-        ocp.constraints.ubx = np.array([d_constraint.z_max])
+        # ocp.constraints.lbx = np.array([d_constraint.z_min])
+        # ocp.constraints.ubx = np.array([d_constraint.z_max])
+        ocp.constraints.lbx = np.array([d_constraint.z_min, d_constraint.T_min])
+        ocp.constraints.ubx = np.array([d_constraint.z_max, d_constraint.T_max])
         # ocp.constraints.idxbx = np.array([0,1,2])
-        ocp.constraints.idxbx = np.array([2])
-        ocp.constraints.lbu = np.concatenate((np.array([d_constraint.T_min]), d_constraint.w_min))
-        ocp.constraints.ubu = np.concatenate((np.array([d_constraint.T_max]), d_constraint.w_max))
+        # ocp.constraints.idxbx = np.array([2])
+        ocp.constraints.idxbx = np.array([2, 13])
+        # ocp.constraints.lbu = np.concatenate((np.array([d_constraint.T_min]), d_constraint.w_min))
+        # ocp.constraints.ubu = np.concatenate((np.array([d_constraint.T_max]), d_constraint.w_max))
+        ocp.constraints.lbu = np.concatenate((np.array([d_constraint.dT_min]), d_constraint.w_min))
+        ocp.constraints.ubu = np.concatenate((np.array([d_constraint.dT_max]), d_constraint.w_max))
         ocp.constraints.idxbu = np.array(range(nu))
         # ocp.constraints.lh = np.array([d_constraint.psi_min])
         # ocp.constraints.uh = np.array([d_constraint.psi_max])
@@ -136,7 +141,8 @@ class DroneOptimizer(object):
         p0, q0 = self.track_cal(0, a_max, v_max, n)
         v0 = np.array([0, 0, 0])
         q0 = np.array([1, 0, 0, 0])
-        x0 = np.concatenate((p0, v0, q0, np.zeros(3)))
+        # x0 = np.concatenate((p0, v0, q0, np.zeros(3)))
+        x0 = np.concatenate((p0, v0, q0, np.zeros(3), np.array([9.8])))
         
         Nsim = int(T_max * self.N / self.T)
         Tsim = 0
@@ -158,7 +164,7 @@ class DroneOptimizer(object):
                 # simTrack[i+j, :] = track_ref
                 simTrack[i+j, 0:3] = p_ref
                 simTrack[i+j, 3:7] = q_ref
-                yref_between = np.concatenate((p_ref, np.zeros(10), np.zeros(self.nu)))
+                yref_between = np.concatenate((p_ref, np.zeros(10), np.array([9.8]), np.zeros(self.nu)))
                 # yref_between = np.concatenate((p_ref, np.zeros(3), q_ref, np.zeros(self.nu)))
                 # yref_between = np.concatenate((p_ref, np.zeros(3), q_ref[1:4], np.zeros(self.nu)))              
                 self.solver.set(j, 'yref', yref_between)
@@ -167,7 +173,7 @@ class DroneOptimizer(object):
             # simTrack[i+self.N, :] = track_ref_N
             simTrack[i+self.N, 0:3] = p_ref_N
             simTrack[i+self.N, 3:7] = q_ref_N
-            yref_N = np.concatenate((p_ref_N, np.zeros(10)))
+            yref_N = np.concatenate((p_ref_N, np.zeros(10), np.array([9.8])))
             # yref_N = np.concatenate((p_ref_N, np.zeros(3), q_ref_N))
             # yref_N = np.concatenate((p_ref_N, np.zeros(3), q_ref_N[1:4]))
             # yref_N = np.concatenate((p0, np.zeros(6)))

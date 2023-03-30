@@ -35,9 +35,11 @@ class DroneModel(object):
         kw = 20  # rate delay
         
         # control input(delay)
-        T_in = ca.MX.sym('thrust',1)
+        # T_in = ca.MX.sym('thrust',1)
+        dT = ca.MX.sym('add_thrust',1)
         w_in = ca.MX.sym('omega',3)
-        controls = ca.vertcat(T_in, w_in)
+        # controls = ca.vertcat(T_in, w_in)
+        controls = ca.vertcat(dT, w_in)
         
         # model states
         p = ca.MX.sym('p',3)    # position
@@ -45,8 +47,8 @@ class DroneModel(object):
         q = ca.MX.sym('q',4)    # rotation 
         w = ca.MX.sym('w',3)    # body rate
         T = ca.MX.sym('T',1)    # thrust
-        # states = ca.vertcat(p, v, q, w, T)
-        states = ca.vertcat(p, v, q, w)        
+        states = ca.vertcat(p, v, q, w, T)
+        # states = ca.vertcat(p, v, q, w)        
 
         # constraint function
         phi_constraint = 2*(q[0]*q[1] + q[2]*q[3]) / (1-2*(q[1]*q[1] + q[2]*q[2]))
@@ -56,20 +58,25 @@ class DroneModel(object):
 
         # function
         z_b_axis = self.q_rot(q, z_axis)
-        # force_T = T*z_b_axis
-        force_T = T_in*z_b_axis
+        force_T = T*z_b_axis
+        # force_T = T_in*z_b_axis
         q_inv = self.q_inv(q)
         v_B = self.q_rot(q_inv, v)
         force_drag = -1*k_d*v_B + (k_h*(v_B[0]*v_B[0] + v_B[1]*v_B[1])+k_h2*v_B[2]*v_B[2])*np.array([.0, .0, 1])
         force_drag = self.q_rot(q, force_drag)
         # paper drag
+        # f_expression=[v,
+        #               (force_T + force_drag)/self.m - np.array([.0, .0, self.g]),
+        #               1/2*self.q_muilty(q, ca.vertcat(0,w)),
+        #               kw*(w_in - w)]
         f_expression=[v,
                       (force_T + force_drag)/self.m - np.array([.0, .0, self.g]),
                       1/2*self.q_muilty(q, ca.vertcat(0,w)),
-                      kw*(w_in - w)]
+                      kw*(w_in - w),
+                      dT]
 
-        # f = ca.Function('f', [states, controls], f_expression, ['state', 'control_input'], ['d_p', 'd_v', 'd_q', 'd_w', 'd_T'])
-        f = ca.Function('f', [states, controls], f_expression, ['state', 'control_input'], ['d_p', 'd_v', 'd_q', 'd_w'])
+        f = ca.Function('f', [states, controls], f_expression, ['state', 'control_input'], ['d_p', 'd_v', 'd_q', 'd_w', 'd_T'])
+        # f = ca.Function('f', [states, controls], f_expression, ['state', 'control_input'], ['d_p', 'd_v', 'd_q', 'd_w'])
 
         # acados model
         p_dot = ca.MX.sym('p_dot',3)    # position
@@ -77,8 +84,8 @@ class DroneModel(object):
         q_dot = ca.MX.sym('q_dot',4)    # rotation
         w_dot = ca.MX.sym('w_dot',3)    # body rate
         T_dot = ca.MX.sym('T_dot',1)    # thrust        
-        # x_dot = ca.vertcat(p_dot, v_dot, q_dot, w_dot, T_dot)
-        x_dot = ca.vertcat(p_dot, v_dot, q_dot, w_dot)
+        x_dot = ca.vertcat(p_dot, v_dot, q_dot, w_dot, T_dot)
+        # x_dot = ca.vertcat(p_dot, v_dot, q_dot, w_dot)
         f_impl = x_dot - ca.vcat(f(states, controls))
 
         model.f_expl_expr = ca.vcat(f(states, controls))
@@ -103,6 +110,8 @@ class DroneModel(object):
         constraint.T_max = self.m * self.g * self.TWR_max   # rot 1200, input 0.929
         # constraint.T_min = 0.2336     # rot 100
         constraint.T_min = 4
+        constraint.dT_max = 60
+        constraint.dT_min = -constraint.dT_max
         # constraint.psi_max = np.tan(np.pi / 2)
         # constraint.psi_min = -constraint.psi_max
 

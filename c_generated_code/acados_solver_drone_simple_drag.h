@@ -39,12 +39,12 @@
 #include "acados_c/ocp_nlp_interface.h"
 #include "acados_c/external_function_interface.h"
 
-#define DRONE_SIMPLE_DRAG_NX     13
+#define DRONE_SIMPLE_DRAG_NX     14
 #define DRONE_SIMPLE_DRAG_NZ     0
 #define DRONE_SIMPLE_DRAG_NU     4
 #define DRONE_SIMPLE_DRAG_NP     0
-#define DRONE_SIMPLE_DRAG_NBX    1
-#define DRONE_SIMPLE_DRAG_NBX0   13
+#define DRONE_SIMPLE_DRAG_NBX    2
+#define DRONE_SIMPLE_DRAG_NBX0   14
 #define DRONE_SIMPLE_DRAG_NBU    4
 #define DRONE_SIMPLE_DRAG_NSBX   0
 #define DRONE_SIMPLE_DRAG_NSBU   0
@@ -60,9 +60,9 @@
 #define DRONE_SIMPLE_DRAG_NG     0
 #define DRONE_SIMPLE_DRAG_NBXN   0
 #define DRONE_SIMPLE_DRAG_NGN    0
-#define DRONE_SIMPLE_DRAG_NY0    17
-#define DRONE_SIMPLE_DRAG_NY     17
-#define DRONE_SIMPLE_DRAG_NYN    13
+#define DRONE_SIMPLE_DRAG_NY0    18
+#define DRONE_SIMPLE_DRAG_NY     18
+#define DRONE_SIMPLE_DRAG_NYN    14
 #define DRONE_SIMPLE_DRAG_N      20
 #define DRONE_SIMPLE_DRAG_NH     0
 #define DRONE_SIMPLE_DRAG_NPHI   0

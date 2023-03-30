@@ -172,8 +172,8 @@ int drone_simple_drag_acados_sim_create(sim_solver_capsule * capsule)
 
     /* initialize input */
     // x
-    double x0[13];
-    for (int ii = 0; ii < 13; ii++)
+    double x0[14];
+    for (int ii = 0; ii < 14; ii++)
         x0[ii] = 0.0;
 
     sim_in_set(drone_simple_drag_sim_config, drone_simple_drag_sim_dims,
@@ -189,11 +189,11 @@ int drone_simple_drag_acados_sim_create(sim_solver_capsule * capsule)
                drone_simple_drag_sim_in, "u", u0);
 
     // S_forw
-    double S_forw[221];
-    for (int ii = 0; ii < 221; ii++)
+    double S_forw[252];
+    for (int ii = 0; ii < 252; ii++)
         S_forw[ii] = 0.0;
-    for (int ii = 0; ii < 13; ii++)
-        S_forw[ii + ii * 13 ] = 1.0;
+    for (int ii = 0; ii < 14; ii++)
+        S_forw[ii + ii * 14 ] = 1.0;
 
 
     sim_in_set(drone_simple_drag_sim_config, drone_simple_drag_sim_dims,
