@@ -37,7 +37,7 @@
 #include "acados_c/sim_interface.h"
 #include "acados_c/external_function_interface.h"
 
-#define DRONE_SIMPLE_DRAG_NX     14
+#define DRONE_SIMPLE_DRAG_NX     17
 #define DRONE_SIMPLE_DRAG_NZ     0
 #define DRONE_SIMPLE_DRAG_NU     4
 #define DRONE_SIMPLE_DRAG_NP     0

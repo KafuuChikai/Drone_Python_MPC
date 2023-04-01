@@ -65,19 +65,19 @@ static void mdlInitializeSizes (SimStruct *S)
 
     // specify dimension information for the input ports
     // lbx_0
-    ssSetInputPortVectorDimension(S, 0, 14);
+    ssSetInputPortVectorDimension(S, 0, 17);
     // ubx_0
-    ssSetInputPortVectorDimension(S, 1, 14);
+    ssSetInputPortVectorDimension(S, 1, 17);
     // y_ref_0
-    ssSetInputPortVectorDimension(S, 2, 18);
+    ssSetInputPortVectorDimension(S, 2, 21);
     // y_ref
-    ssSetInputPortVectorDimension(S, 3, 342);
+    ssSetInputPortVectorDimension(S, 3, 399);
     // y_ref_e
-    ssSetInputPortVectorDimension(S, 4, 14);
+    ssSetInputPortVectorDimension(S, 4, 17);
     // lbx
-    ssSetInputPortVectorDimension(S, 5, 38);
+    ssSetInputPortVectorDimension(S, 5, 95);
     // ubx
-    ssSetInputPortVectorDimension(S, 6, 38);
+    ssSetInputPortVectorDimension(S, 6, 95);
     // lbu
     ssSetInputPortVectorDimension(S, 7, 80);
     // ubu
@@ -85,7 +85,7 @@ static void mdlInitializeSizes (SimStruct *S)
     ssSetOutputPortVectorDimension(S, 0, 4 );
     ssSetOutputPortVectorDimension(S, 1, 1 );
     ssSetOutputPortVectorDimension(S, 2, 1 );
-    ssSetOutputPortVectorDimension(S, 3, 14 ); // state at shooting node 1
+    ssSetOutputPortVectorDimension(S, 3, 17 ); // state at shooting node 1
     ssSetOutputPortVectorDimension(S, 4, 1);
     ssSetOutputPortVectorDimension(S, 5, 1 );
 
@@ -155,18 +155,18 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     int N = DRONE_SIMPLE_DRAG_N;      
 
     // local buffer
-    real_t buffer[18];
+    real_t buffer[21];
 
     /* go through inputs */
     // lbx_0
     in_sign = ssGetInputPortRealSignalPtrs(S, 0);
-    for (int i = 0; i < 14; i++)
+    for (int i = 0; i < 17; i++)
         buffer[i] = (double)(*in_sign[i]);
 
     ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, 0, "lbx", buffer);
     // ubx_0
     in_sign = ssGetInputPortRealSignalPtrs(S, 1);
-    for (int i = 0; i < 14; i++)
+    for (int i = 0; i < 17; i++)
         buffer[i] = (double)(*in_sign[i]);
     ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, 0, "ubx", buffer);
 
@@ -174,7 +174,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     // y_ref_0
     in_sign = ssGetInputPortRealSignalPtrs(S, 2);
 
-    for (int i = 0; i < 18; i++)
+    for (int i = 0; i < 21; i++)
         buffer[i] = (double)(*in_sign[i]);
 
     ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, 0, "yref", (void *) buffer);
@@ -185,8 +185,8 @@ static void mdlOutputs(SimStruct *S, int_T tid)
 
     for (int ii = 1; ii < N; ii++)
     {
-        for (int jj = 0; jj < 18; jj++)
-            buffer[jj] = (double)(*in_sign[(ii-1)*18+jj]);
+        for (int jj = 0; jj < 21; jj++)
+            buffer[jj] = (double)(*in_sign[(ii-1)*21+jj]);
         ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, ii, "yref", (void *) buffer);
     }
 
@@ -194,7 +194,7 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     // y_ref_e
     in_sign = ssGetInputPortRealSignalPtrs(S, 4);
 
-    for (int i = 0; i < 14; i++)
+    for (int i = 0; i < 17; i++)
         buffer[i] = (double)(*in_sign[i]);
 
     ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, N, "yref", (void *) buffer);
@@ -202,16 +202,16 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     in_sign = ssGetInputPortRealSignalPtrs(S, 5);
     for (int ii = 1; ii < N; ii++)
     {
-        for (int jj = 0; jj < 2; jj++)
-            buffer[jj] = (double)(*in_sign[(ii-1)*2+jj]);
+        for (int jj = 0; jj < 5; jj++)
+            buffer[jj] = (double)(*in_sign[(ii-1)*5+jj]);
         ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "lbx", (void *) buffer);
     }
     // ubx
     in_sign = ssGetInputPortRealSignalPtrs(S, 6);
     for (int ii = 1; ii < N; ii++)
     {
-        for (int jj = 0; jj < 2; jj++)
-            buffer[jj] = (double)(*in_sign[(ii-1)*2+jj]);
+        for (int jj = 0; jj < 5; jj++)
+            buffer[jj] = (double)(*in_sign[(ii-1)*5+jj]);
         ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, ii, "ubx", (void *) buffer);
     }
     // lbu
