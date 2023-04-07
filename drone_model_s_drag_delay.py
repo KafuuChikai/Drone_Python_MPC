@@ -129,7 +129,7 @@ class DroneModel(object):
         # constraint.w_max = 1*np.array([np.pi, np.pi, np.pi])
         # constraint.w_min = -constraint.w_max
         # constraint.w_max = np.array([5, 5, 0.3])
-        constraint.w_max = np.array([2, 2, 0.1])
+        constraint.w_max = np.array([2, 2, 0.5])
         constraint.w_min = -constraint.w_max
         # constraint.T_max = 25.7544
         # constraint.T_max = 68.3   #rot 1800, input 0.95
@@ -141,7 +141,7 @@ class DroneModel(object):
         constraint.dT_max = np.array([50])
         constraint.dT_min = -constraint.dT_max
         # constraint.dw_max = np.array([50, 50, 3])
-        constraint.dw_max = np.array([20, 20, 0.2])
+        constraint.dw_max = np.array([20, 20, 1])
         constraint.dw_min = -constraint.dw_max
         # constraint.phi_max = np.array([np.tan(np.pi / 2.1)])
         # constraint.phi_min = -constraint.phi_max
