@@ -252,4 +252,4 @@ if __name__ == '__main__':
     drone_model = DroneModel()
     opt = DroneOptimizer(d_model=drone_model.model,
                                d_constraint=drone_model.constraint, t_horizon=1, n_nodes=20)
-    opt.simulation(T_max=1, a_max=20, v_max=10, n=2)
+    opt.simulation(T_max=10, a_max=35, v_max=15, n=1)

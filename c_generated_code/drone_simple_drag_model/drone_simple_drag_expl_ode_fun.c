@@ -543,8 +543,8 @@ static int casadi_f0(const casadi_real** arg, casadi_real** res, casadi_int* iw,
   for (i=0, rr=w2, cs=w2; i<4; ++i) (*rr++)  = (w9*(*cs++));
   /* #213: output[0][2] = @2 */
   if (res[0]) casadi_copy(w2, 4, res[0]+6);
-  /* #214: @9 = 10 */
-  w9 = 10.;
+  /* #214: @9 = 20 */
+  w9 = 20.;
   /* #215: @7 = input[0][5] */
   casadi_copy(arg[0] ? arg[0]+14 : 0, 3, w7);
   /* #216: @7 = (@7-@15) */

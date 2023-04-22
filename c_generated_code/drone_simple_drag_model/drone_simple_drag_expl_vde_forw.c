@@ -604,8 +604,8 @@ static int casadi_f0(const casadi_real** arg, casadi_real** res, casadi_int* iw,
   for (i=0, rr=w93, cs=w93; i<4; ++i) (*rr++)  = (w71*(*cs++));
   /* #213: output[0][2] = @93 */
   if (res[0]) casadi_copy(w93, 4, res[0]+6);
-  /* #214: @79 = 10 */
-  w79 = 10.;
+  /* #214: @79 = 20 */
+  w79 = 20.;
   /* #215: @75 = input[0][5] */
   casadi_copy(arg[0] ? arg[0]+14 : 0, 3, w75);
   /* #216: @75 = (@75-@72) */

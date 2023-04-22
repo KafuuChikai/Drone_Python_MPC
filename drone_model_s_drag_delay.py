@@ -45,8 +45,8 @@ class DroneModel(object):
         k_d = np.array([0.2782, 0.2755, 0.1003])
         k_h = -0.0042
         k_h2 = -0.0791
-        # kw = 20  # rate delay
-        kw = 10
+        kw = 20  # rate delay
+        # kw = 10
         
         # control input(delay), dT, dw
         # T_in = ca.MX.sym('thrust',1)
@@ -136,7 +136,7 @@ class DroneModel(object):
         # constraint.w_min = -constraint.w_max
         # constraint.w_max = np.array([5, 5, 0.3])
         # constraint.w_max = np.array([3, 3, 0.5])
-        constraint.w_max = np.array([2, 2, 0.5])
+        constraint.w_max = np.array([5, 5, 0.5])
         constraint.w_min = -constraint.w_max
         # constraint.T_max = 25.7544
         # constraint.T_max = 68.3   #rot 1800, input 0.95
