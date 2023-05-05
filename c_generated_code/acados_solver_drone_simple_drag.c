@@ -628,13 +628,13 @@ void drone_simple_drag_acados_create_5_set_nlp_in(drone_simple_drag_solver_capsu
     double* ubx = lubx + NBX;
     
     lbx[0] = 0.1;
-    ubx[0] = 100;
-    lbx[1] = 5;
+    ubx[0] = 200;
+    lbx[1] = 4.9;
     ubx[1] = 29.4;
-    lbx[2] = -5;
-    ubx[2] = 5;
-    lbx[3] = -5;
-    ubx[3] = 5;
+    lbx[2] = -10;
+    ubx[2] = 10;
+    lbx[3] = -10;
+    ubx[3] = 10;
     lbx[4] = -0.5;
     ubx[4] = 0.5;
 

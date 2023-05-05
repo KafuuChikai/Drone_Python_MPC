@@ -130,20 +130,20 @@ class DroneModel(object):
         model.name = 'drone_simple_drag'
 
         # constraint
-        constraint.z_max = np.array([100])
+        constraint.z_max = np.array([200])
         constraint.z_min = np.array([0.1])
         # constraint.w_max = 1*np.array([np.pi, np.pi, np.pi])
         # constraint.w_min = -constraint.w_max
         # constraint.w_max = np.array([5, 5, 0.3])
         # constraint.w_max = np.array([3, 3, 0.5])
-        constraint.w_max = np.array([5, 5, 0.5])
+        constraint.w_max = np.array([10, 10, 0.5])
         constraint.w_min = -constraint.w_max
         # constraint.T_max = 25.7544
         # constraint.T_max = 68.3   #rot 1800, input 0.95
         constraint.T_max = np.array([self.m * self.g * self.TWR_max])   # rot 1200, input 0.929
         # constraint.T_min = 0.2336     # rot 100
         # constraint.T_min = np.array([4])
-        constraint.T_min = np.array([5])
+        constraint.T_min = np.array([self.m * self.g / 2])
         # constraint.dT_max = np.array([200])
         constraint.dT_max = np.array([100])
         # constraint.dT_max = np.array([50])

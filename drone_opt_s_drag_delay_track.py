@@ -153,12 +153,12 @@ class DroneOptimizer(object):
         self.solver = AcadosOcpSolver(ocp, json_file=json_file)
         self.integrator = AcadosSimSolver(ocp, json_file=json_file)
 
-    def simulation(self, T_max, a_max, v_max, n):
+    def simulation(self, d_model, T_max, a_max, v_max, n):
         p0, q0 = self.track_cal(0, a_max, v_max, n)
         v0 = np.array([0, 0, 0])
         q0 = np.array([1, 0, 0, 0])
         # x0 = np.concatenate((p0, v0, q0, np.zeros(3)))
-        x0 = np.concatenate((p0, v0, q0, np.zeros(3), np.array([9.8]), np.zeros(3)))
+        x0 = np.concatenate((p0, v0, q0, np.zeros(3), np.array([d_model.m * d_model.g]), np.zeros(3)))
         
         Nsim = int(T_max * self.N / self.T)
         Tsim = 0
@@ -180,7 +180,7 @@ class DroneOptimizer(object):
                 # simTrack[i+j, :] = track_ref
                 simTrack[i+j, 0:3] = p_ref
                 simTrack[i+j, 3:7] = q_ref
-                yref_between = np.concatenate((p_ref, np.zeros(10), np.array([9.8]), np.zeros(3), np.zeros(self.nu)))
+                yref_between = np.concatenate((p_ref, np.zeros(10), np.array([d_model.m * d_model.g]), np.zeros(3), np.zeros(self.nu)))
                 # yref_between = np.concatenate((p_ref, np.zeros(3), q_ref, np.zeros(self.nu)))
                 # yref_between = np.concatenate((p_ref, np.zeros(3), q_ref[1:4], np.zeros(self.nu)))              
                 self.solver.set(j, 'yref', yref_between)
@@ -189,7 +189,7 @@ class DroneOptimizer(object):
             # simTrack[i+self.N, :] = track_ref_N
             simTrack[i+self.N, 0:3] = p_ref_N
             simTrack[i+self.N, 3:7] = q_ref_N
-            yref_N = np.concatenate((p_ref_N, np.zeros(10), np.array([9.8]), np.zeros(3)))
+            yref_N = np.concatenate((p_ref_N, np.zeros(10), np.array([d_model.m * d_model.g]), np.zeros(3)))
             # yref_N = np.concatenate((p_ref_N, np.zeros(3), q_ref_N))
             # yref_N = np.concatenate((p_ref_N, np.zeros(3), q_ref_N[1:4]))
             # yref_N = np.concatenate((p0, np.zeros(6)))
@@ -252,4 +252,4 @@ if __name__ == '__main__':
     drone_model = DroneModel()
     opt = DroneOptimizer(d_model=drone_model.model,
                                d_constraint=drone_model.constraint, t_horizon=1, n_nodes=20)
-    opt.simulation(T_max=10, a_max=35, v_max=15, n=1)
+    opt.simulation(d_model=drone_model, T_max=10, a_max=5, v_max=5, n=1)
