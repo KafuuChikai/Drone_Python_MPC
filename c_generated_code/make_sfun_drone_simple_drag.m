@@ -38,7 +38,7 @@ SOURCES = { ...
             'acados_solver_drone_simple_drag.c'
           };
 
-INC_PATH = '/home/wx/acados/include';
+INC_PATH = '/home/wx/acados//include';
 
 INCS = {['-I', fullfile(INC_PATH, 'blasfeo', 'include')], ...
         ['-I', fullfile(INC_PATH, 'hpipm', 'include')], ...
@@ -54,7 +54,7 @@ COMPDEFINES = 'COMPDEFINES=$COMPDEFINES';
 
 
 
-LIB_PATH = ['-L', fullfile('/home/wx/acados/lib')];
+LIB_PATH = ['-L', fullfile('/home/wx/acados//lib')];
 
 LIBS = {'-lacados', '-lhpipm', '-lblasfeo'};
 

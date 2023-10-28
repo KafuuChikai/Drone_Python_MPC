@@ -75,7 +75,7 @@ static const casadi_int casadi_s1[8] = {4, 1, 0, 4, 0, 1, 2, 3};
 static const casadi_int casadi_s2[3] = {0, 0, 0};
 
 static const casadi_real casadi_c0[3] = {0., 0., 1.};
-static const casadi_real casadi_c1[3] = {-2.7820000000000000e-01, -2.7550000000000002e-01, -1.0030000000000000e-01};
+static const casadi_real casadi_c1[3] = {-2.9180000000000000e-01, -3.1530000000000002e-01, -1.6700000000000000e-02};
 static const casadi_real casadi_c2[3] = {0., 0., 9.8000000000000007e+00};
 
 /* drone_simple_drag_expl_ode_fun:(i0[17],i1[4],i2[])->(o0[17]) */
@@ -228,7 +228,7 @@ static int casadi_f0(const casadi_real** arg, casadi_real** res, casadi_int* iw,
   for (rr=(&w1), ss=w5+0; ss!=w5+1; ss+=1) *rr++ = *ss;
   /* #66: @10 = @2[0] */
   for (rr=(&w10), ss=w2+0; ss!=w2+1; ss+=1) *rr++ = *ss;
-  /* #67: @4 = [-0.2782, -0.2755, -0.1003] */
+  /* #67: @4 = [-0.2918, -0.3153, -0.0167] */
   casadi_copy(casadi_c1, 3, w4);
   /* #68: @13 = @2[0] */
   for (rr=(&w13), ss=w2+0; ss!=w2+1; ss+=1) *rr++ = *ss;
@@ -358,8 +358,8 @@ static int casadi_f0(const casadi_real** arg, casadi_real** res, casadi_int* iw,
   for (i=0, rr=w4, cs=w15; i<3; ++i) (*rr++) *= (*cs++);
   /* #126: @14 = [0, 0, 1] */
   casadi_copy(casadi_c0, 3, w14);
-  /* #127: @6 = -0.0042 */
-  w6 = -4.1999999999999997e-03;
+  /* #127: @6 = 0.005 */
+  w6 = 5.0000000000000001e-03;
   /* #128: @18 = @15[0] */
   for (rr=(&w18), ss=w15+0; ss!=w15+1; ss+=1) *rr++ = *ss;
   /* #129: @18 = sq(@18) */
@@ -372,8 +372,8 @@ static int casadi_f0(const casadi_real** arg, casadi_real** res, casadi_int* iw,
   w18 += w9;
   /* #133: @6 = (@6*@18) */
   w6 *= w18;
-  /* #134: @18 = -0.0791 */
-  w18 = -7.9100000000000004e-02;
+  /* #134: @18 = -0.0949 */
+  w18 = -9.4899999999999998e-02;
   /* #135: @9 = @15[2] */
   for (rr=(&w9), ss=w15+2; ss!=w15+3; ss+=1) *rr++ = *ss;
   /* #136: @18 = (@18*@9) */
