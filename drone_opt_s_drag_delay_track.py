@@ -39,7 +39,9 @@ class DroneOptimizer(object):
         # Ensure current working directory is current folder
         os.chdir(os.path.dirname(os.path.realpath(__file__)))
         self.acados_models_dir =os.path.join(os.getcwd(), 'acados_models')
+        self.save_dir = os.path.join(os.getcwd(), 'data')
         safe_mkdir_recursive(self.acados_models_dir)
+        safe_mkdir_recursive(self.save_dir)
         acados_source_path = os.environ['ACADOS_SOURCE_DIR']
         sys.path.insert(0, acados_source_path)
 
@@ -223,9 +225,9 @@ class DroneOptimizer(object):
         print("average estimation time is {}".format(time_record.mean()))
         print("max estimation time is {}".format(time_record.max()))
         print("min estimation time is {}".format(time_record.min()))
-        np.savetxt(fname="drone_state.csv", X=simX, fmt="%lf",delimiter=",")
-        np.savetxt(fname="drone_control.csv", X=simU, fmt="%lf",delimiter=",")
-        np.savetxt(fname="drone_track.csv", X=simTrack, fmt="%lf",delimiter=",")
+        np.savetxt(fname=self.save_dir + "/drone_state.csv", X=simX, fmt="%lf",delimiter=",")
+        np.savetxt(fname=self.save_dir + "/drone_control.csv", X=simU, fmt="%lf",delimiter=",")
+        np.savetxt(fname=self.save_dir + "/drone_track.csv", X=simTrack, fmt="%lf",delimiter=",")
         
     def track_cal(self, t, a_max, v_max, n):
         r_max = v_max**2/a_max
