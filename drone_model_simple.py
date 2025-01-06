@@ -22,31 +22,27 @@ class DroneModel(object):
         
         # control input
         T = ca.MX.sym('thrust',1)
-        M = ca.MX.sym('moment',3)
-        controls = ca.vertcat(T, M)
+        w = ca.MX.sym('omega',3)
+        controls = ca.vertcat(T, w)
         
-        # n_controls = controls.size()[0]
         # model states
         p = ca.MX.sym('p',3)    # position
         v = ca.MX.sym('v',3)    # velocity
         q = ca.MX.sym('q',4)    # rotation        
-        w = ca.MX.sym('w',3)    # omega
-        states = ca.vertcat(p, v, q, w)        
+        states = ca.vertcat(p, v, q)        
         
         # function
         f_expression=[v,
                       T*self.q_rot(q, z_axis)/self.m - np.array([.0, .0, self.g]),
-                      1/2*self.q_muilty(q, ca.vertcat(0,w)),
-                      np.linalg.inv(self.I)@(M - ca.cross(w, self.I@w))]
+                      1/2*self.q_muilty(q, ca.vertcat(0,w))]
         
-        f = ca.Function('f', [states, controls], f_expression, ['state', 'control_input'], ['d_p', 'd_v', 'd_q', 'd_w'])
+        f = ca.Function('f', [states, controls], f_expression, ['state', 'control_input'], ['d_p', 'd_v', 'd_q'])
 
         # acados model
         p_dot = ca.MX.sym('p_dot',3)    # position
         v_dot = ca.MX.sym('v_dot',3)    # velocity
         q_dot = ca.MX.sym('q_dot',4)    # rotation        
-        w_dot = ca.MX.sym('w_dot',3)    # omega
-        x_dot = ca.vertcat(p_dot, v_dot, q_dot, w_dot)
+        x_dot = ca.vertcat(p_dot, v_dot, q_dot)
         f_impl = x_dot - ca.vcat(f(states, controls))
 
         model.f_expl_expr = ca.vcat(f(states, controls))
@@ -55,16 +51,13 @@ class DroneModel(object):
         model.xdot = x_dot
         model.u = controls
         model.p = []
-        model.name = 'drone'
+        model.name = 'drone_simple'
 
         # constraint
-        constraint.w_max = 2 * np.array([np.pi, np.pi, np.pi])
-        constraint.w_min = 2 * np.array([-np.pi, -np.pi, -np.pi])
-        
+        constraint.w_max = 2*np.array([np.pi, np.pi, np.pi])
+        constraint.w_min = 2*np.array([-np.pi, -np.pi, -np.pi])
         constraint.T_max = 30
         constraint.T_min = 0
-        constraint.M_max = 2 * np.array([1, 1, 1])
-        constraint.M_min = 2 * np.array([-1, -1, -1])
 
         self.model = model
         self.constraint = constraint

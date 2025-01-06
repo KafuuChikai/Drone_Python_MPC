@@ -7,10 +7,9 @@ import shutil
 import errno
 import timeit
 
-from drone_model import DroneModel
+from drone_model_simple import DroneModel
 from acados_template import AcadosOcp, AcadosOcpSolver, AcadosSimSolver
 
-# import casadi as ca
 import numpy as np
 import scipy.linalg
 
@@ -36,20 +35,11 @@ class DroneOptimizer(object):
         model = d_model
         self.T = t_horizon
         self.N = n_nodes
-        
-        # # track parem
-        # self.track.v_max = 10
-        # self.track.a_max = 10
-        # self.track.n = 2
-        # # track parem cal
-        # self.track.r_max = self.track.v_max**2 / self.track.a_max
-        # self.track.r_min = self.track.r_max / self.track.n
-        # self.track.k = self.track.a_max / self.track.v_max
 
         # Ensure current working directory is current folder
         os.chdir(os.path.dirname(os.path.realpath(__file__)))
-        self.acados_models_dir = './acados_models'
-        safe_mkdir_recursive(os.path.join(os.getcwd(), self.acados_models_dir))
+        self.acados_models_dir =os.path.join(os.getcwd(), 'acados_models')
+        safe_mkdir_recursive(self.acados_models_dir)
         acados_source_path = os.environ['ACADOS_SOURCE_DIR']
         sys.path.insert(0, acados_source_path)
 
@@ -72,45 +62,102 @@ class DroneOptimizer(object):
         ocp.dims.np = n_params
         ocp.parameter_values = np.zeros(n_params)
 
-        # cost type
-        Q = np.diag([200, 200, 500, 1, 1, 1, 5, 5, 200, 1, 1, 1])
-        R = np.diag([6, 6, 6, 6])
-        # Q = np.diag([200, 200, 500, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1])
+        '''
+        Cal type:
+        type 1: all ref
+        type 2: x, q; u ref
+        type 3: x; u ref
+        type 4: x ref (?)
+        '''
+
+        # cost type 1
+        # Q = np.diag([200, 200, 500, 1, 1, 1, 5, 5, 200, 1, 1, 1])
+        # R = np.diag([6, 6, 6, 6])
+        # Q = np.diag([200, 200, 500, 0.01, 0.01, 0.01, 1, 1, 200])
         # R = np.diag([0.1, 0.1, 0.1, 0.1])
+        # ocp.cost.cost_type = 'LINEAR_LS'
+        # ocp.cost.cost_type_e = 'LINEAR_LS'
+        # ocp.cost.W = scipy.linalg.block_diag(Q, R)
+        # ocp.cost.W_e = Q
+        
+        # cost type 2
+        # Q = np.diag([200, 200, 500, 1, 1, 200])
+        # R = np.diag([0.1, 0.1, 0.1, 0.1])
+        # ocp.cost.cost_type = 'LINEAR_LS'
+        # ocp.cost.cost_type_e = 'LINEAR_LS'
+        # ocp.cost.W = scipy.linalg.block_diag(Q, R)
+        # ocp.cost.W_e = Q
+        
+        # cost type 3
+        Q = np.diag([200, 200, 500])
+        R = np.diag([0.1, 0.1, 0.1, 0.1])
         ocp.cost.cost_type = 'LINEAR_LS'
         ocp.cost.cost_type_e = 'LINEAR_LS'
         ocp.cost.W = scipy.linalg.block_diag(Q, R)
         ocp.cost.W_e = Q
         
         # q(x,y,z) -> dim: ny-1
-        ocp.cost.Vx = np.zeros((ny-1, nx))
-        ocp.cost.Vx[:6, :6] = np.eye(6)
-        ocp.cost.Vx[6:9, 7:10] = np.eye(3)
-        ocp.cost.Vx[9:12, 10:13] = np.eye(3)
-        ocp.cost.Vx_e = ocp.cost.Vx[:(nx-1), :nx]
+        # Vx type 1
+        # ocp.cost.Vx = np.zeros(((ny-1), nx))
+        # ocp.cost.Vx[:6, :6] = np.eye(6)
+        # ocp.cost.Vx[6:9, 7:10] = np.eye(3)
+        # ocp.cost.Vx_e = ocp.cost.Vx[:(nx-1), :nx]
+        # Vu type 1
+        # ocp.cost.Vu = np.zeros(((ny-1), nu))
+        # ocp.cost.Vu[-nu:, -nu:] = np.eye(nu)
         
-        ocp.cost.Vu = np.zeros((ny-1, nu))
+        # Vx type 2
+        # ocp.cost.Vx = np.zeros(((ny-4), nx))
+        # ocp.cost.Vx[:3, :3] = np.eye(3)
+        # ocp.cost.Vx[3:6, 7:10] = np.eye(3)
+        # ocp.cost.Vx_e = ocp.cost.Vx[:(nx-4), :nx]
+        # Vu type 2
+        # ocp.cost.Vu = np.zeros(((ny-4), nu))
+        # ocp.cost.Vu[-nu:, -nu:] = np.eye(nu)
+
+        # Vx type 3
+        ocp.cost.Vx = np.zeros(((ny-7), nx))
+        ocp.cost.Vx[:3, :3] = np.eye(3)
+        ocp.cost.Vx_e = ocp.cost.Vx[:(nx-7), :nx]
+        # Vu type 3
+        ocp.cost.Vu = np.zeros(((ny-7), nu))
         ocp.cost.Vu[-nu:, -nu:] = np.eye(nu)
 
         # set constraints
-        ocp.constraints.lbu = np.concatenate((np.array([d_constraint.T_min]), d_constraint.M_min))
-        ocp.constraints.ubu = np.concatenate((np.array([d_constraint.T_max]), d_constraint.M_max))
+        ocp.constraints.lbx = np.array([-6,-6,-6])
+        ocp.constraints.ubx = np.array([6,6,6])
+        ocp.constraints.idxbx = np.array([0,1,2])
+        ocp.constraints.lbu = np.concatenate((np.array([d_constraint.T_min]), d_constraint.w_min))
+        ocp.constraints.ubu = np.concatenate((np.array([d_constraint.T_max]), d_constraint.w_max))
         ocp.constraints.idxbu = np.array(range(nu))
-        ocp.constraints.lbx = d_constraint.w_min
-        ocp.constraints.ubx = d_constraint.w_max
-        ocp.constraints.idxbx = np.array(range(10, 13))
 
+        # initial state
         x_init = np.zeros(nx)
         x_init[6] = 1
-        u_ref = np.zeros(nu)
-        # initial state
         ocp.constraints.x0 = x_init
-        x_ref = np.zeros(nx-1)
+        
+        # initial ref type 1
+        # u_ref = np.zeros(nu)        
+        # x_ref = np.zeros(nx-1)
+        # ocp.cost.yref = np.concatenate((x_ref, u_ref))
+        # ocp.cost.yref_e = x_ref
+        
+        # initial ref type 2
+        # u_ref = np.zeros(nu)        
+        # x_ref = np.zeros(nx-4)
+        # ocp.cost.yref = np.concatenate((x_ref, u_ref))
+        # ocp.cost.yref_e = x_ref
+        
+        # initial ref type 3
+        u_ref = np.zeros(nu)        
+        x_ref = np.zeros(nx-7)
         ocp.cost.yref = np.concatenate((x_ref, u_ref))
         ocp.cost.yref_e = x_ref
 
         # solver options
         ocp.solver_options.qp_solver = 'FULL_CONDENSING_QPOASES'
+        # ocp.solver_options.qp_solver = 'PARTIAL_CONDENSING_HPIPM'
+        # ocp.solver_options.qp_solver = 'FULL_CONDENSING_HPIPM'
         ocp.solver_options.hessian_approx = 'GAUSS_NEWTON'
         # explicit Runge-Kutta integrator
         ocp.solver_options.integrator_type = 'ERK'
@@ -118,7 +165,8 @@ class DroneOptimizer(object):
         ocp.solver_options.nlp_solver_type = 'SQP_RTI'
 
         # compile acados ocp
-        json_file = os.path.join('./'+model.name+'_acados_ocp.json')
+        json_file = os.path.join(self.acados_models_dir, model.name+'_acados_ocp.json')
+        print(json_file)
         self.solver = AcadosOcpSolver(ocp, json_file=json_file)
         self.integrator = AcadosSimSolver(ocp, json_file=json_file)
 
@@ -127,12 +175,12 @@ class DroneOptimizer(object):
         simU = np.zeros((self.N, self.nu))
         x_current = x0
         simX[0, :] = x0.reshape(1, -1)
-        xs_between = np.concatenate((xs, np.zeros(self.nu)))
         time_record = np.zeros(self.N)
 
         # closed loop
         self.solver.set(self.N, 'yref', xs)
         for i in range(self.N):
+            xs_between = np.concatenate((xs[0:3], xs[3:9], np.zeros(self.nu)))
             self.solver.set(i, 'yref', xs_between)
 
         for i in range(self.N):
@@ -159,9 +207,6 @@ class DroneOptimizer(object):
             # update
             x_current = self.integrator.get('x')
             simX[i+1, :] = x_current
-            
-        # print(simX)
-        # print(simU)
 
         print("average estimation time is {}".format(time_record.mean()))
         print("max estimation time is {}".format(time_record.max()))
@@ -173,4 +218,4 @@ if __name__ == '__main__':
     drone_model = DroneModel()
     opt = DroneOptimizer(d_model=drone_model.model,
                                d_constraint=drone_model.constraint, t_horizon=1, n_nodes=100)
-    opt.simulation(x0=np.array([0, 0, -5, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0]), xs=np.array([10, 10, -5, 0, 0, 0, 0, 0, 0, 0, 0, 0]))
+    opt.simulation(x0=np.array([0, 0, -5, 0, 0, 0, 1, 0, 0, 0]), xs=np.array([1, 1, -5]))
