@@ -130,7 +130,7 @@ class DroneModel(object):
         model.xdot = x_dot
         model.u = controls
         model.p = []
-        model.name = 'drone_simple_drag'
+        model.name = 'drone_simple_drag_delay'
 
         # constraint
         constraint.z_max = np.array([200])

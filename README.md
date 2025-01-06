@@ -15,13 +15,30 @@ This project implements **Nonlinear Model Predictive Control (NMPC)** for drones
 
 ## 2. File Structure
 
-- `drone_opt_simple.py`: Simple drone optimization.
+```plaintext
+drone_model/                : Directory containing different drone models.
+  ├── drone_model.py        : Full drone model.
+  ├── drone_model_s.py      : Simple drone model.
+  ├── drone_model_s_drag.py : Drone model with drag force.
+  ├── drone_model_s_drag_delay.py : Drone model with drag force and delay.
+data/                       : Directory for storing generated data.
+  ├── drone_track.csv       : CSV file containing drone trajectory data.
+  ├── drone_state.csv       : CSV file containing drone state data.
+  ├── drone_control.csv     : CSV file containing drone control data.
+acados_models/              : Directory for storing generated acados model files.
+c_generated_code/           : Directory for storing generated c code.
+[drone_opt_track.py]
+[drone_opt_simple_point.py]
+[drone_opt_simple_track.py]
+[drone_opt_s_drag_track.py]
+[drone_opt_s_drag_delay_track.py]
+```
+
+- `drone_opt_track.py`: Full model drone trajectory tracking.
+- `drone_opt_simple_point.py`: Simple drone optimization to reach a point.
 - `drone_opt_simple_track.py`: Simple drone trajectory tracking optimization.
 - `drone_opt_s_drag_track.py`: Drone trajectory tracking with drag force.
 - `drone_opt_s_drag_delay_track.py`: Drone trajectory tracking with drag force and delay.
-- `drone_model/`: Contains different drone models.
-- `data/`: Stores generated data.
-- `acados_models/`: Stores generated acados model files.
 
 ## 3. Usage
 
