@@ -38,8 +38,8 @@ class DroneOptimizer(object):
 
         # Ensure current working directory is current folder
         os.chdir(os.path.dirname(os.path.realpath(__file__)))
-        self.acados_models_dir = './acados_models'
-        safe_mkdir_recursive(os.path.join(os.getcwd(), self.acados_models_dir))
+        self.acados_models_dir =os.path.join(os.getcwd(), 'acados_models')
+        safe_mkdir_recursive(self.acados_models_dir)
         acados_source_path = os.environ['ACADOS_SOURCE_DIR']
         sys.path.insert(0, acados_source_path)
 
@@ -125,7 +125,7 @@ class DroneOptimizer(object):
         ocp.solver_options.nlp_solver_type = 'SQP_RTI'
 
         # compile acados ocp
-        json_file = os.path.join('./'+model.name+'_acados_ocp.json')
+        json_file = os.path.join(self.acados_models_dir, model.name+'_acados_ocp.json')
         self.solver = AcadosOcpSolver(ocp, json_file=json_file)
         self.integrator = AcadosSimSolver(ocp, json_file=json_file)
 
