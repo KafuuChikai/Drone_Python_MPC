@@ -7,7 +7,7 @@ import shutil
 import errno
 import timeit
 
-from drone_model_s_drag import DroneModel
+from drone_model.drone_model_s_drag import DroneModel
 from acados_template import AcadosOcp, AcadosOcpSolver, AcadosSimSolver
 
 import numpy as np
