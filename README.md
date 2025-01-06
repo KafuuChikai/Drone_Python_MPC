@@ -17,6 +17,7 @@ This project implements **Nonlinear Model Predictive Control (NMPC)** for drones
 
 ```plaintext
 drone_model/                : Directory containing different drone models.
+  ├── drone_simulator.py    : model test.
   ├── drone_model.py        : Full drone model.
   ├── drone_model_s.py      : Simple drone model.
   ├── drone_model_s_drag.py : Drone model with drag force.
@@ -51,3 +52,20 @@ c_generated_code/           : Directory for storing generated c code.
 
 3. The generated data will be saved in the `data/` directory in various formats such as `.csv` files, including `drone_track.csv`, `drone_state.csv`, and `drone_control.csv`.
 
+
+## 4. How to Test the Model
+
+To test the drone model, you can use the `drone_simulator.py` script. This script simulates the drone's behavior and saves the resulting state and command data.
+
+1. Run the simulation script:
+
+   ```bash
+   python drone_simulator.py
+   ```
+
+2. The script will generate and save the following data files in the `data` directory:
+
+   - `drone_state.csv`: Contains the state data of the drone during the simulation.
+   - `drone_cmd.csv`: Contains the command data sent to the drone during the simulation.
+
+3. The script will also plot the states of the drone for visualization.
