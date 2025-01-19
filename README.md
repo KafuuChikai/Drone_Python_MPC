@@ -4,7 +4,7 @@ This project implements **Nonlinear Model Predictive Control (NMPC)** for drones
 
 https://github.com/user-attachments/assets/ac3a069f-15b0-40a2-944d-c9868e00fa6f
 
-Test NMPC with low-level PID controller in Gazebo.
+Integrating NMPC with a low-level PID controller in a comprehensive simulation environment using Gazebo, PX4, and ROS.
 
 ## 1. Installation
 
