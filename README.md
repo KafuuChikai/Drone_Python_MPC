@@ -2,6 +2,10 @@
 
 This project implements **Nonlinear Model Predictive Control (NMPC)** for drones using **Python**. The goal of this project is to implement trajectory tracking and control for drones using Model Predictive Control (MPC) algorithms. The project includes implementations of various drone models.
 
+https://github.com/user-attachments/assets/ac3a069f-15b0-40a2-944d-c9868e00fa6f
+
+Test NMPC with low-level PID controller in Gazebo.
+
 ## 1. Installation
 
 1. Install **acados** and its dependencies, refer to the [acados official documentation](https://docs.acados.org/installation/index.html).
